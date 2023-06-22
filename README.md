@@ -317,8 +317,6 @@ final case class Dog() extends Animal
 4. Conversely, if you need to compare `Temporal` references with `==` and `!=`, you know what you are doing; be aware you need different semantics (this is easily forgotten because we are used to universal equality).
    In such a case, it is appropriate to *locally* define `given Eq[Temporal] = Eq`. For your own benefit, keep this local and stay safe in the rest of your code.
 5. Likewise for `Inet6Address` and `Inet4Address`, both implementing `InetAddress`.
-   Optionally, in order to guarantee the use of strict equality regardless of build settings, you may also include this in your sources
-
 
 ### Enforcing strict equality
 In order to guarantee the use of strict equality regardless of build settings, you may include this in your sources
