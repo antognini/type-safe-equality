@@ -1,11 +1,11 @@
-package equality
+package equality.collection
 
-import equality.TypesafeIterableOnceExtension.*
+import TypesafeIterableOnceExtension.*
 
-trait TypesafeIterableOnceExtension
+private[collection] trait TypesafeIterableOnceExtension
   extends TypesafeRootIterableOnceExtension
 
-case object TypesafeIterableOnceExtension extends TypesafeIterableOnceExtension:
+private[collection] object TypesafeIterableOnceExtension extends TypesafeIterableOnceExtension:
 
   trait TypesafeRootIterableOnceExtension:
     extension[A, I <: collection.IterableOnce[A]] (iterableOnce: I)

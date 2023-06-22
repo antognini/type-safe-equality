@@ -4,7 +4,7 @@ import equality.Eq
 
 export EqInstances.given
 
-object EqInstances:
+private[equality] object EqInstances:
   given java_nio_ByteBuffer: Eq[java.nio.ByteBuffer] = Eq
   given java_nio_ShortBuffer: Eq[java.nio.ShortBuffer] = Eq
   given java_nio_IntBuffer: Eq[java.nio.IntBuffer] = Eq

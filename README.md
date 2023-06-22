@@ -30,7 +30,7 @@ Eq type class
 import equality.Eq
 import java.util.jar.Attributes
 
-// making jar attributes comparable with != and ++ with strict equality enabled
+// making jar attributes comparable with == and != with strict equality enabled
 given Eq[Attributes] = Eq
 
 Attributes() == Attributes()
@@ -52,12 +52,13 @@ today == now
 ```
 
 Collection extensions
+
 ```scala
-import equality.CollectionExtension.*
+import equality.collection.*
 
 // using an equality-safe alternative to .contains()
-val names = List( "Alice", "Bob")
-names.contains_safe("Peter") 
+val names = List("Alice", "Bob")
+names.contains_safe("Peter")
 
 names.contains_safe(1)
 // ERROR: Values of types A and A cannot be compared with == or !=
@@ -192,11 +193,16 @@ import mypackage.MyEqInstances.given
 :warning: **This feature requires enabling strict equality compiler option!**
 
 ```scala
-import equality.CollectionExtension.*
+import equality.collection.*
 import equality.Eq
 
-final case class Apple(x: String) derives Eq
-final case class Car(x: String) derives Eq
+final case class Apple(x: String)
+
+derives Eq
+
+final case class Car(x: String)
+
+derives Eq
 
 val (appleA, appleB, appleC) = (Apple("A"), Apple("B"), Apple("C"))
 val (carX, carY) = (Car("X"), Car("Y"))
@@ -204,14 +210,14 @@ val (carX, carY) = (Car("X"), Car("Y"))
 val apples = List(appleA, appleB, appleC)
 val cars = List(carX, carY)
 
-apples.contains(carX)      //  type checks but it shouldn't => always yields false
+apples.contains(carX) //  type checks but it shouldn't => always yields false
 apples.contains_safe(carX) // ERROR, it's pointless to search for a car in a list of apples
 
-apples.diff(cars)      // type checks but it shouldn't => always returns the original apple List
+apples.diff(cars) // type checks but it shouldn't => always returns the original apple List
 apples.diff_safe(cars) // ERROR, it's pointless to remove a list of cars from a list of apples
 ```
 
-As a workaround, until this issue is solved in a consistent way, search & replace those, anywhere the .xxx_safe() signatures do compile with `import equality.CollectionExtension.*`:
+As a workaround, until this issue is solved in a consistent way, search & replace those, anywhere the .xxx_safe() signatures do compile with `import equality.collection.*`:
 
 | FROM                 | TO                        |
 |----------------------|---------------------------|
@@ -249,7 +255,7 @@ trait Map[K, +V] // only the variance of the key is relevant (Map has similar se
 4. No extension methods are defined for any traits/classes inheriting `Set` or `Map`. Such types have type safe signatures *out of the box*
 5. The `.xxx_safe()` methods are inlined, they produce the same code as the original`.xxx()` signatures; the only difference is type safety
 6. There are no known debugging difficulties associated with `.xxx_safe()`
-7. Hopefully this extension will become obsolete, replaced by some solution that allows to safely use the original Scala collections API
+7. Hopefully this extension will become obsolete, replaced by some solution that allows to safely use the original collections API
 
 # Strict equality considerations
 

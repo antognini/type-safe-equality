@@ -1,6 +1,7 @@
 package equality
 
 import util.NotGiven
+import annotation.implicitNotFound
 
 export equality.java_io.EqInstances.given
 export equality.java_lang.EqInstances.given
@@ -19,5 +20,6 @@ export equality.scala_concurrent_duration.EqInstances.given
 type Eq[-T] = CanEqual[T, T]
 val Eq = CanEqual.derived
 
-def enforceStrictEquality()(using NotGiven[CanEqual[Any, Any]]): Boolean = true
+def enforceStrictEquality()(using @implicitNotFound("the sources need to be compiled with -language:strictEquality") ev:NotGiven[CanEqual[Any, Any]]): Boolean = true
+
 private val enforce = enforceStrictEquality()

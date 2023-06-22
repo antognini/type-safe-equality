@@ -3,7 +3,8 @@ package equality.java_time
 import equality.Eq
 
 export EqInstances.given
-object EqInstances:
+
+private[equality] object EqInstances:
   given java_time_Duration: Eq[java.time.Duration] = Eq
   given java_time_Instant: Eq[java.time.Instant] = Eq
   given java_time_LocalDate: Eq[java.time.LocalDate] = Eq

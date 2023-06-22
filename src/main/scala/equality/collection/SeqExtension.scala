@@ -1,17 +1,17 @@
-package equality
+package equality.collection
 
-import equality.TypesafeSeqExtension.*
+import TypesafeSeqExtension.*
 
-import collection.Searching.SearchResult
-import collection.mutable
+import scala.collection.Searching.SearchResult
+import scala.collection.mutable
 
-trait TypesafeSeqExtension
+private[collection] trait TypesafeSeqExtension
   extends TypesafeRootSeqExtension
     with TypesafeRootSeqExtensionForOverloads
     with TypesafeMutableSeqExtension
     with TypesafeImmutableSeqExtension
 
-case object TypesafeSeqExtension extends TypesafeSeqExtension:
+private[collection] object TypesafeSeqExtension extends TypesafeSeqExtension:
 
   trait TypesafeRootSeqExtension:
     extension[A, S <: collection.Seq[A]] (seq: S)

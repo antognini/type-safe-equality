@@ -31,7 +31,7 @@ def standardEqInstances: Unit =
 
 
 def collectionExtensions: Unit =
-  import equality.CollectionExtension.*
+  import equality.collection.*
 
   val names = List( "Alice", "Bob")
   names.contains_safe("Peter") // equality-safe alternative to .contains()

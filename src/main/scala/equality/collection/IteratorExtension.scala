@@ -1,12 +1,12 @@
-package equality
+package equality.collection
 
-import equality.TypesafeIteratorExtension.*
+import TypesafeIteratorExtension.*
 
-trait TypesafeIteratorExtension
+private[collection] trait TypesafeIteratorExtension
   extends TypesafeRootIteratorExtension
     with TypesafeRootIteratorExtensionForOverloads
 
-case object TypesafeIteratorExtension extends TypesafeIteratorExtension:
+private[collection] case object TypesafeIteratorExtension extends TypesafeIteratorExtension:
 
   trait TypesafeRootIteratorExtension:
     extension[A, S <: collection.Iterator[A]] (iterator: S)

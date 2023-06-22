@@ -4,7 +4,7 @@ import equality.Eq
 
 export EqInstances.given
 
-object EqInstances:
+private[equality] object EqInstances:
   given java_sql_Date: Eq[java.sql.Date] = Eq
   given java_sql_Time: Eq[java.sql.Time] = Eq
   given java_sql_Timestamp: Eq[java.sql.Timestamp] = Eq

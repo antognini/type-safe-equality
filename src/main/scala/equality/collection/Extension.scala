@@ -1,6 +1,8 @@
-package equality
+package equality.collection
 
-case object CollectionExtension
+export Extension.*
+
+private object Extension
   extends TypesafeIterableOnceExtension
     with TypesafeIteratorExtension
     with TypesafeSeqExtension
