@@ -213,16 +213,18 @@ apples.diff_safe(cars) // ERROR, it's pointless to remove a list of cars from a 
 
 As a workaround, until this issue is solved in a consistent way, search & replace those, anywhere the .xxx_safe() signatures do compile with `import equality.CollectionExtension.*`:
 
-| FROM               |  TO                         |
-|--------------------|-----------------------------|
-| .contains(         |  .contains_safe(            |
-| .containsSlice(    |  .containsSlice_safe(       |
-| .indexOf(          |  .indexOf_safe(             |
-| .indexOfSlice(     |  .indexOfSlice_safe(        |
-| .lastIndexOf(      |  .lastIndexOf_safe(         |
-| .lastIndexOfSlice( |  .lastIndexOfSlice_safe(    |
-| .sameElements(     |  .sameElements_safe(        |
-| .search(           |  .search_safe(              |
+| FROM                 | TO                        |
+|----------------------|---------------------------|
+| `.contains(`         | `.contains_safe(`         |
+| `.containsSlice(`    | `.containsSlice_safe(`    |
+| `.indexOf(`          | `.indexOf_safe(`          |
+| `.indexOfSlice(`     | `.indexOfSlice_safe(`     |
+| `.lastIndexOf(`      | `.lastIndexOf_safe(`      |
+| `.lastIndexOfSlice(` | `.lastIndexOfSlice_safe(` |
+| `.sameElements(`     | `.sameElements_safe(`     |
+| `.search(`           | `.search_safe(`           |
+| `.diff(`             | `.diff_safe(`             |
+| `.intersect(`        | `.intersect_safe(`        |
 
 
 The workarounds are defined for collection traits which have a covariant type parameter
