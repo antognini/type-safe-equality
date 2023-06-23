@@ -5,14 +5,18 @@ ThisBuild / organizationHomepage := None
 ThisBuild / description := "Scala 3 type safe equality"
 ThisBuild / homepage := Some(url("https://github.com/antognini/type-safe-equality"))
 ThisBuild / licenses := Seq("Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0"))
+ThisBuild / scmInfo := Some(
+  ScmInfo(
+    url("https://github.com/antognini/type-safe-equality"),
+    "scm:git@github.com:antognini/type-safe-equality.git"
+))
 ThisBuild / developers := List(
-    Developer(
-      id = "LA",
-      name = "Luigi Antognini",
-      email = "",
-      url = url("https://github.com/antognini")
-    )
-)
+  Developer(
+    id = "LA",
+    name = "Luigi Antognini",
+    email = "",
+    url = url("https://github.com/antognini")
+))
 
 lazy val root = project
   .in(file("."))
