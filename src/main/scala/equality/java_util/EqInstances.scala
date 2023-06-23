@@ -4,7 +4,7 @@ import equality.Eq
 
 export EqInstances.given
 
-private[equality] object EqInstances:
+object EqInstances:
   given java_util_Date: Eq[java.util.Date] = Eq
   given java_util_Locale: Eq[java.util.Locale] = Eq
   given java_util_Locale_Category: Eq[java.util.Locale.Category] = Eq

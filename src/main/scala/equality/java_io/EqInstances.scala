@@ -4,5 +4,5 @@ import equality.Eq
 
 export EqInstances.given
 
-private[equality] object EqInstances:
+object EqInstances:
   given java_io_File: Eq[java.io.File] = Eq

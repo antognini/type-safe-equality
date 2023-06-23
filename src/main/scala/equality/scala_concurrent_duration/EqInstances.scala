@@ -4,6 +4,6 @@ import equality.Eq
 
 export EqInstances.given
 
-private[equality] object EqInstances:
+object EqInstances:
   given scala_concurrent_duration_Duration: Eq[scala.concurrent.duration.Duration] = Eq
   given scala_concurrent_duration_Deadline: Eq[scala.concurrent.duration.Deadline] = Eq

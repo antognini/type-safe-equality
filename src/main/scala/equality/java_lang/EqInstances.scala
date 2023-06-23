@@ -4,7 +4,7 @@ import equality.Eq
 
 export EqInstances.given
 
-private[equality] object EqInstances:
+object EqInstances:
   given java_lang_Enum: Eq[java.lang.Enum[?]] = Eq
   given java_lang_Boolean: Eq[java.lang.Boolean] = Eq
   given java_lang_Throwable: Eq[java.lang.Throwable] = Eq

@@ -4,5 +4,5 @@ import equality.Eq
 
 export EqInstances.given
 
-private[equality] object EqInstances:
+object EqInstances:
   given scala_Array[T]: Eq[scala.Array[T]] = Eq

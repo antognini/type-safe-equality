@@ -172,7 +172,9 @@ import equality.Eq
 
 // all Eq defined for package java.util + other 3 predefined + 1 on your own
 object MyEqInstances:
-   export equality.java.util.given
+
+   // top (package) level wildcard exports (.* and .given) are not allowed in Scala, EqInstances.given must be used
+   export equality.java_util.EqInstances.given
    
    export equality.java_io_File
    export equality.java_nio_file_Path

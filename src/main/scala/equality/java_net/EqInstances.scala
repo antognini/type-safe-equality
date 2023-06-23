@@ -4,7 +4,7 @@ import equality.Eq
 
 export EqInstances.given
 
-private[equality] object EqInstances:
+object EqInstances:
   given java_net_URI: Eq[java.net.URI] = Eq
   given java_net_URL: Eq[java.net.URL] = Eq
   given java_net_HttpCookie: Eq[java.net.HttpCookie] = Eq
