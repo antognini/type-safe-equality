@@ -2,6 +2,8 @@
 
 This library is about facilitating the adoption of [multiversal equality](https://docs.scala-lang.org/scala3/reference/contextual/multiversal-equality.html) and transition towards strict equality.
 
+**[  For a preview, turn to the released version 0.1.0; focus is now on consistent equality for case classes (new Eq)  ]**
+
 * [Eq type class](#eq-type-class) - alias for CanEqual trait with only a single type parameter 
 * [Standard Eq instances](#standard-eq-instances) - equality type class instances for relevant Java and Scala standard library types
 * [Collection extensions](#collection-extensions) - equality-safe extension methods for standard Scala collections
