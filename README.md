@@ -14,7 +14,7 @@ Special thanks to **Martin Ockajak** for painstakingly reviewing this.
 
 # Getting Started
 
-This library requires **[Scala 3.3](https://scala-lang.org/blog/2023/05/30/scala-3.3.0-released.html)+** on **[Java 11](https://docs.oracle.com/en/java/javase/11/docs/api/)+**. 
+This library requires **[Scala 3.3](https://scala-lang.org/blog/2023/05/30/scala-3.3.0-released.html)+** on **[Java 11](https://en.wikipedia.org/wiki/Java_version_history)+**. 
 
 Enable strict equality and include the library dependency in your `build.sbt`
 ```scala
