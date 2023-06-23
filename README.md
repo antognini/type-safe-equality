@@ -1,7 +1,5 @@
 **Scala 3 type safe equality**
 
-## [work in progess, to be released soon]
-
 This library is about facilitating the adoption of [multiversal equality](https://docs.scala-lang.org/scala3/reference/contextual/multiversal-equality.html) and transition towards strict equality.
 
 * [Eq type class](#eq-type-class) - alias for CanEqual trait with only a single type parameter 
@@ -196,13 +194,8 @@ import mypackage.MyEqInstances.given
 import equality.collection.*
 import equality.Eq
 
-final case class Apple(x: String)
-
-derives Eq
-
-final case class Car(x: String)
-
-derives Eq
+final case class Apple(x: String) derives Eq
+final case class Car(x: String) derives Eq
 
 val (appleA, appleB, appleC) = (Apple("A"), Apple("B"), Apple("C"))
 val (carX, carY) = (Car("X"), Car("Y"))
@@ -210,16 +203,25 @@ val (carX, carY) = (Car("X"), Car("Y"))
 val apples = List(appleA, appleB, appleC)
 val cars = List(carX, carY)
 
-apples.contains(carX) //  type checks but it shouldn't => always yields false
-apples.contains_safe(carX) // ERROR, it's pointless to search for a car in a list of apples
+// it's pointless to search for a car in a list of apples
+apples.contains(carX)
+// type checks but it shouldn't --> yields false
 
-apples.diff(cars) // type checks but it shouldn't => always returns the original apple List
-apples.diff_safe(cars) // ERROR, it's pointless to remove a list of cars from a list of apples
+apples.contains_safe(carX) 
+// ERROR: Values of types A and A cannot be compared with == or !=
+//        where: A is a type variable with constraint >: Apple | Car
+
+// it's pointless to remove a list of cars from a list of apples
+apples.diff(cars)      
+// type checks but it shouldn't --> returns the original apple List
+
+apples.diff_safe(cars)
+// ERROR: Values of types Apple and Apple | Car cannot be compared with == or !=
 ```
 
 As a workaround, until this issue is solved in a consistent way, search & replace those, anywhere the .xxx_safe() signatures do compile with `import equality.collection.*`:
 
-| FROM                 | TO                        |
+| From                 | To                        |
 |----------------------|---------------------------|
 | `.contains(`         | `.contains_safe(`         |
 | `.containsSlice(`    | `.containsSlice_safe(`    |
@@ -274,7 +276,7 @@ val f2:F = (x:Int) => x + 1
 // returns the same as f1 eq f2 (comparison for identity, not equality)
 if f1 == f2 then whatever
 ```
-What is the intention behind `f1 == f2`: to compare identity (evaluating to `false`), or to compare algorithmical equality (evaluating to `true`)? There is currently no way to compare algorithmical equality in Scala, so it could potentially be a programming error. In such a case, in strict equality the compiler can invite to think about it:
+What is the intention behind `f1 == f2`: to compare identity (which should evaluate to `false`), or to compare algorithmical equality (which should evaluate to `true`)? There is currently no way to compare algorithmical equality in Scala, so it could potentially be a programming error. In such a case, in strict equality the compiler can invite to think about it:
 ```scala
 // strict equality on
 if f1 == f2 then whatever // ERROR: Values of types F and F cannot be compared with == or !=
@@ -286,7 +288,7 @@ However, it can become tedious to declare strict equality type class instances f
 
 ### Composition
 
-In the following example, `derives Eq` does allow to compare values of class `Person` for equality, even without a defined `given Eq[LocalDate]`:
+In the following example, `derives Eq` does allow to compare values of class `Person` for equality, even without `given Eq[LocalDate]` in scope
 
 ```scala
 import java.time.LocalDate
@@ -313,7 +315,33 @@ final case class Dog() extends Animal
 // Within this hierarchy, any value can compare to any other value with == and !=
 ```
 
-### Equality on standard library types
+### Type parameters
+```scala
+  final case class Bag[A](elements: A*)
+
+  // propagate Eq[A] --> Eq[Bag[A]]
+  given [A](using Eq[A]): Eq[Bag[A]] = Eq
+
+  final case class Apple(x: Int) derives Eq
+  final case class Pear(x: Int) // no Eq
+
+  val apples: Bag[Apple] = Bag(Apple(0), Apple(1), Apple(2))
+  val pears: Bag[Pear] = Bag(Pear(10), Pear(11), Pear(12))
+
+  apples == apples
+
+  pears == pears
+  // ERROR: Values of types Bag[Pear] and Bag[Pear] cannot be compared with == or !=.
+  // I found : given_Eq_Bag[Pear](/* missing */ summon[equality.Eq[Pear]])
+  // But no implicit values were found that match type equality.Eq[Pear].
+
+  apples == pears
+  // ERROR: Values of types Bag[Apple] and Bag[Pear] cannot be compared with == or !=.
+  // I found: given_Eq_Bag[A]
+  // But given instance given_Eq_Bag does not match type CanEqual[Bag[Apple], Bag[Pear]].
+```
+
+### Standard library types
 1. Equality for standard types are defined to avoid the most common type safety pitfalls.
 2. For example, in `java.time.*`, `Date` and `DateTime` both extend `Temporal`.
    However, no `given Eq[Temporal]` is provided, as it would let `Date` and `DateTime` become comparable with `==` and `!=`.

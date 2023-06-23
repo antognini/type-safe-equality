@@ -1,11 +1,13 @@
 package example
 
+import scala.annotation.nowarn
+
 @main def quickStart() =
   eqTypeClass
   standardEqInstances
   collectionExtensions
 
-
+@nowarn
 def eqTypeClass: Unit =
   import equality.Eq
   import java.util.jar.Attributes
@@ -15,7 +17,7 @@ def eqTypeClass: Unit =
 
   Attributes() == Attributes()
 
-
+@nowarn
 def standardEqInstances: Unit =
   import equality.given
   import java.time.{LocalDate, LocalDateTime}
