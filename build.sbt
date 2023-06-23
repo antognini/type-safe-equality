@@ -18,7 +18,7 @@ lazy val root = project
   .in(file("."))
   .settings(
     name := "type-safe-equality",
-    version := "0.0.0-SNAPSHOT",
+    version := "0.1.0",
     scalaVersion := "3.3.0",
     Compile / scalacOptions ++= Seq(
       "-encoding", "utf8",
