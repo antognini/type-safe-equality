@@ -277,15 +277,15 @@ val f1:F = (x:Int) => x + 1
 val f2:F = (x:Int) => x + 1
 
 // compiles with strict equality turned off
-// returns the same as f1 eq f2 (comparison for identity, not equality)
+// returns the same as f1 eq f2 (comparison for reference equality, not object equality)
 if f1 == f2 then whatever
 ```
-What is the intention behind `f1 == f2`: to compare identity (which should evaluate to `false`), or to compare algorithmical equality (which should evaluate to `true`)? There is currently no way to compare algorithmical equality in Scala, so it could potentially be a programming error. In such a case, in strict equality the compiler can invite to think about it:
+What is the intention behind `f1 == f2`: to compare reference equality (which should evaluate to `false`), or to compare algorithmical equality (which should evaluate to `true`)? There is currently no way to compare algorithmical equality in Scala, so it could potentially be a programming error. In such a case, in strict equality the compiler can invite to think about it:
 ```scala
 // strict equality on
 if f1 == f2 then whatever // ERROR: Values of types F and F cannot be compared with == or !=
 ```
-If the intention is to compare the functions for identity, it can be done with `f1 eq f2` (although type unsafe) or by *locally* allowing `f1 == f2` (after realizing `==` boils down to identity).
+If the intention is to compare the functions for reference equality, it can be done with `f1 eq f2` (although type unsafe) or by *locally* allowing `f1 == f2` (after realizing `==` boils down to reference equality).
 Similar pitfalls may happen for traits `Future`, `Promise`, `ServerSocket` and other structures which are critical to equal *out of the box*.
 
 However, it can become tedious to declare strict equality type class instances for types like `Array`, `LocalDate`, `File`, or `Duration` (either Scala or Java `Duration`), which is the motivation for this library.
