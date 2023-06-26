@@ -2,7 +2,7 @@
 
 This library is about facilitating the adoption of [multiversal equality](https://docs.scala-lang.org/scala3/reference/contextual/multiversal-equality.html) and transition towards strict equality.
 
-**[  For a preview, turn to the released version 0.1.0; focus is now on consistent equality for case classes (new Eq)  ]**
+**[  The released version 0.1.0 is a preview, focus is now on consistent equality for case classes (new Eq)  ]**
 
 * [Eq type class](#eq-type-class) - alias for CanEqual trait with only a single type parameter 
 * [Standard Eq instances](#standard-eq-instances) - equality type class instances for relevant Java and Scala standard library types
@@ -285,7 +285,7 @@ What is the intention behind `f1 == f2`: to compare identity (which should evalu
 // strict equality on
 if f1 == f2 then whatever // ERROR: Values of types F and F cannot be compared with == or !=
 ```
-If the intention is to compare the functions for identity, it can be done with `f1 eq f2` or by *locally* allowing `f1 == f2` (after realizing `==` boils down to identity).
+If the intention is to compare the functions for identity, it can be done with `f1 eq f2` (although type unsafe) or by *locally* allowing `f1 == f2` (after realizing `==` boils down to identity).
 Similar pitfalls may happen for traits `Future`, `Promise`, `ServerSocket` and other structures which are critical to equal *out of the box*.
 
 However, it can become tedious to declare strict equality type class instances for types like `Array`, `LocalDate`, `File`, or `Duration` (either Scala or Java `Duration`), which is the motivation for this library.
