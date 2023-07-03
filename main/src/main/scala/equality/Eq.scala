@@ -6,7 +6,7 @@ export equality.scala_all.EqInstances.{AnyNumber, AnyJavaNumber}
 export equality.java_all.EqInstances.given
 
 sealed trait Eq[-T]:
-  override def toString = "Eq"
+  override def toString = "Eq.derived"
 
 object Eq:
   inline def derived[T]: Eq[T] = EqMacro.derived

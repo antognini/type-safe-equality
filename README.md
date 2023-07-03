@@ -16,7 +16,7 @@ This makes equality behave in a standard and intuitive way equivalent to other m
 
 <br/>
 
-Further considerations on strict equality are discussed [here](#strict-equality-considerations). 
+A motivation for the library can be found [here](#motivation), and further considerations on strict equality are discussed [here](#strict-equality-considerations). 
 
 # Getting started
 
