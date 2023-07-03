@@ -12,7 +12,7 @@ This makes equality behave in a standard and intuitive way equivalent to other m
 
 <br/>
 
-![](https://github.com/antognini/type-safe-equality/blob/eq/site/example-ide-1a.png)
+![](https://github.com/antognini/type-safe-equality/blob/main/site/example-ide-1a.png)
 
 <br/>
 
