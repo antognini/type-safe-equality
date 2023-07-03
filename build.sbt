@@ -5,6 +5,10 @@ ThisBuild / organizationHomepage := None
 ThisBuild / description := "Scala 3 type safe equality"
 ThisBuild / homepage := Some(url("https://github.com/antognini/type-safe-equality"))
 ThisBuild / licenses := Seq("Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0"))
+ThisBuild / version := "0.2.0"
+ThisBuild / scalaVersion := "3.3.0"
+ThisBuild / versionScheme := Some("semver-spec")
+ThisBuild / publishTo := sonatypePublishToBundle.value
 ThisBuild / scmInfo := Some(
   ScmInfo(
     url("https://github.com/antognini/type-safe-equality"),
@@ -18,22 +22,43 @@ ThisBuild / developers := List(
     url = url("https://github.com/antognini")
 ))
 
+lazy val compileOptions = Seq(
+  "-encoding", "utf8",
+  "-deprecation",
+  "-language:scala3",
+  "-new-syntax",
+  "-indent",
+  "-language:strictEquality",
+  "-java-output-version", "11",
+  "-Wunused:all"
+)
+
 lazy val root = project
   .in(file("."))
+  .dependsOn(main)
   .settings(
+     name := "type-safe-equality",
+     publish / skip := true,
+     Compile / scalacOptions ++= compileOptions
+   )
+  .aggregate(main, examples)
+
+lazy val main = project
+  .in(file("main"))
+  .settings(
+    libraryDependencies ++= Seq(
+        "org.scalatest" %% "scalatest" % "3.2.16" % "test"
+    ),
     name := "type-safe-equality",
-    version := "0.1.0",
-    scalaVersion := "3.3.0",
-    Compile / scalacOptions ++= Seq(
-      "-encoding", "utf8",
-      "-deprecation",
-      "-language:scala3",
-      "-new-syntax",
-      "-indent",
-      "-language:strictEquality",
-      "-java-output-version", "11",
-      "-Wunused:all"
-    )
+    Compile / scalacOptions ++= compileOptions
+  )
+
+lazy val examples = project
+  .in(file("examples"))
+  .dependsOn(main)
+  .settings(
+    publish / skip := true,
+    Compile / scalacOptions ++= compileOptions
   )
 
 // Publish
@@ -53,5 +78,3 @@ credentials ++= Seq(
     Option(System.getenv("SONATYPE_PASSWORD")).getOrElse("")
   )
 )
-ThisBuild / publishTo := sonatypePublishToBundle.value
-ThisBuild / versionScheme := Some("semver-spec")
