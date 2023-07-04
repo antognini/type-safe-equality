@@ -407,35 +407,59 @@ However, it can become tedious to declare strict equality type class instances f
 
 # Strict equality considerations
 
-## Number types
+## Using type parameters for numbers
 
-Scala allows to freely compare values of types `Byte`, `Char`, `Short`, `Int`, `Long`, `BigInt`, `Float`, `Double`, `BigDecimal` with one another, also in strict equality enabled:
+Scala allows to freely compare values of types `Byte`, `Char`, `Short`, `Int`, `Long`, `BigInt`, `Float`, `Double`, `BigDecimal` for equality with one another, also in strict equality enabled:
 
 ```scala
 1 == 1L
 ```
 
-This is how composed numbers behave with strict equality enabled without `Eq`:
+Invariant type parameters number composition with `CanEqual`:
 ```scala
-// Covariant type parameter
-case class Box[+A](a: A)
+// Invariant type parameter A
+case class Box[A](a: A) derives CanEqual
 
+// Compiles out of the box
 Box(1) == Box(1L)
-// ERROR: Values of types Box[Int] and Box[Long] cannot be compared with == or !=
 ```
 
-This is how composed numbers behave with strict equality enabled with `Eq`:
+Invariant type parameter number composition failure with `Eq`:
 ```scala
 import equality.{*, given}
 
-// Covariant type parameter
-case class Box[+A: Eq](a: A) derives Eq
+// Invariant type parameter A
+case class Box[A: Eq](a: A) derives Eq
 
-// Compiles because Eq type class is derived 
+Box(1) == Box(1L)
+// ERROR: Values of types Box[Int] and Box[Long] cannot be compared with == or !=.
+```
+
+Invariant type parameter number composition with `Eq`:
+```scala
+import equality.{*, given}
+
+// Invariant type parameter A
+case class Box[A: Eq](a: A) derives Eq, CanEqual
+
+// Compiles because class Box additionally derives CanEqual 
 Box(1) == Box(1L)
 ```
 
-This works because the library defines an `Eq` instance for the union of all number types:
+Covariant type parameter number composition with `Eq`:
+```scala
+import equality.{*, given}
+
+// Covariant type parameter A
+case class Box[+A: Eq](a: A) derives Eq
+
+// Compiles without CanEqual because type parameter A is covariant and an instance of
+// Eq[Box[AnyNumber]] (-> see explanation below)
+// is available and can be applied both to Eq[Box[Int]] and Eq[Box[Long]].
+Box(1) == Box(1L)
+```
+
+The example above (with covariant type parameter A) works because the library defines an `Eq` instance for the union of all number types:
 ```scala
 package equality.scala_
 
@@ -443,7 +467,7 @@ type AnyNumber = Byte | Char | Short | Int | Long | BigInt | Float | Double | Bi
 given scala_AnyNumber: Eq[AnyNumber] = Eq.assumed
 ```
 
-Another example:
+Another example with a covariant type parameter:
 ```scala
 import equality.{*, given}
 
@@ -497,6 +521,7 @@ checkStrictEqualityBuild()
 ## Missing constructor type decomposition 
 
 In the example below, the `Eq` type class derivation does not decompose the constructor parameter type `Seq[B]` to check if it contains type parameters (it actually contains type parameter `B`).
+This will be corrected in the next release.
 
 ```scala
 // [B: Eq] should be enforced, too
