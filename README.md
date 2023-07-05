@@ -2,7 +2,7 @@
 
 Provides type safe equality features allowing developers to fully leverage compiler strict equality support.
 
-This makes equality behave in a standard and intuitive way equivalent to other modern programming languages.
+This makes equality behave in a standard and intuitive way equivalent to other modern programming languages, like [std::cmp::Eq](https://doc.rust-lang.org/beta/std/cmp/trait.Eq.html) for Rust or [Data.Eq](https://hackage.haskell.org/package/base-4.18.0.0/docs/Data-Eq.html) for Haskell.
 
 * [Eq type class](#eq-type-class) - strict equality type class with automatic derivation for case classes
 * [Standard Eq instances](#standard-eq-instances) - equality type class instances for relevant Java and Scala standard library types
