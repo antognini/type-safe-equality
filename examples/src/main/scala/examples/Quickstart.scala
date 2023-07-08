@@ -35,14 +35,14 @@ def getting_started: Unit =
   // Derive equality for a product type
   case class Box[A: Eq](
     name: String,
-    item: A
+    item: Either[String, A]
   ) derives Eq
-  val box = Box("my box", Attributes())
+  val box = Box("my box", Right(Attributes()))
   box == box
 
   // Use an equality-safe alternative to .contains()
   val names = List(now, now)
-  names.contains_safe(now)
+  names.contains_eq(now)
 
 
 @nowarn
@@ -57,7 +57,7 @@ def verified_equality_for_composed_case_classes_via_type_class_derivation: Unit 
     contact: Email,
   ) derives Eq
 
-  val person = Person("Alice", Email("alice@behappy.com"))
+  val person = Person("Alice", Email("alice@maluma.osw"))
 
   // Only compiles because class Person derives Eq
   person == person
@@ -76,7 +76,7 @@ def verified_equality_for_composed_case_classes_with_type_parameters_via_type_cl
   ) derives Eq
 
   // Only compiles because class Email derives Eq
-  val person = Person("Alice", Email("alice@behappy.com"))
+  val person = Person("Alice", Email("alice@maluma.osw"))
 
   person == person
 
@@ -100,9 +100,9 @@ def assumed_equality_for_the_bottom_classes_of_a_class_hierarchy_via_type_class_
   case class Cat() extends Animal derives Eq.assumed
   case class Dog() extends Animal derives Eq.assumed
 
-  // Values of type Cat can compare each other with == and !=
-  // Values of type Dog can compare each other with == and !=
-  // Within this hierarchy, any other comparison with == and != fails
+  // Values of type Cat can compare each other with == or !=
+  // Values of type Dog can compare each other with == or !=
+  // Within this hierarchy, any other comparison with == or != fails
 
 
 @nowarn
@@ -113,7 +113,7 @@ def assumed_equality_for_the_base_class_of_a_class_hierarchy_via_type_class_deri
   case class Cat() extends Animal
   case class Dog() extends Animal
 
-  // Within this hierarchy, any value can compare to any other value with == and !=
+  // Within this hierarchy, any value can compare to any other value with == or !=
 
 
 @nowarn
@@ -164,7 +164,7 @@ def collectionExtension:Unit =
   apples.contains(carX)
   // Type checks but it shouldn't --> yields false
 
-  // apples.contains_safe(carX)
+  // apples.contains_eq(carX)
   // ERROR: Values of types A and A cannot be compared with == or !=
   //        where: A is a type variable with constraint >: Apple | Car
 
@@ -172,7 +172,7 @@ def collectionExtension:Unit =
   apples.diff(cars)
   // Type checks but it shouldn't --> returns the original list
 
-  // apples.diff_safe(cars)
+  // apples.diff_eq(cars)
   // ERROR: Values of types Apple and Apple | Car cannot be compared with == or !=
 
 

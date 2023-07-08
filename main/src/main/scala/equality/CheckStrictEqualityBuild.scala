@@ -1,7 +1,7 @@
 package equality
 
-import util.NotGiven
-import annotation.implicitNotFound
+import scala.annotation.implicitNotFound
+import scala.util.NotGiven
 
 private val msg = "the sources need to be compiled with -language:strictEquality"
 

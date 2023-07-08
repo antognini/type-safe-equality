@@ -1,13 +1,34 @@
 package equality
 
+/**
+ * Equality-safe reference comparison.
+ *
+ * @see [[https://github.com/antognini/type-safe-equality/tree/main#reference-equality Library documentation]]
+ */
 sealed trait EqRef[A <: AnyRef]:
 
   extension (a: A)
-    inline def equalRef[B <: A](b: B): Boolean = a eq b
-    inline def notEqualRef[B <: A](b: B): Boolean = a ne b
 
-  inline def equalRef[B <: A](a: A, b: B): Boolean = a eq b
-  inline def notEqualRef[B <: A](a: A, b: B): Boolean = a ne b
+    /**
+     * Equality-safe alternative to the eq operator.
+     *
+     * @see [[https://github.com/antognini/type-safe-equality/tree/main#reference-equality Library documentation]]
+     *
+     * @tparam B target type
+     * @param value target value to be compared against
+     * @return true if the two references are equal, false otherwise
+     */
+    inline def equalRef[B <: A](value: B): Boolean = a eq value
+
+    /**
+     * Equality-safe alternative to the ne operator.
+     *
+     * @see [[https://github.com/antognini/type-safe-equality/tree/main#reference-equality Library documentation]]
+     * @tparam B target type
+     * @param value target value to be compared against
+     * @return true if the two references are not equal, false otherwise
+     */
+    inline def notEqualRef[B <: A](value: B): Boolean = a ne value
 
 object EqRef:
-  def apply[A <: AnyRef]: EqRef[A] = new EqRef[A]{}
+  def apply[A <: AnyRef]: EqRef[A] = new EqRef[A] {}

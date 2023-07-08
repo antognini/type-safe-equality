@@ -1,13 +1,13 @@
-package test
+package equality
 
 import equality.scala_.EqInstances.AnyJavaNumber
-import org.scalatest.freespec.AnyFreeSpec
 import equality.{*, given}
+import org.scalatest.freespec.AnyFreeSpec
 
-case class Box[+A: Eq](a: A) derives Eq
+case class Box[+A: Eq](a: A)derives Eq
 
-class CompileTest extends AnyFreeSpec:
-  "compile test" in {
+class SummonTest extends AnyFreeSpec:
+  "" - {
 
     summon[Eq[Byte]]
     summon[Eq[Short]]
@@ -51,4 +51,4 @@ class CompileTest extends AnyFreeSpec:
     summon[Eq[Box[Seq[Some[(Boolean, Char, Int)]]]]]
     summon[Eq[Box[Seq[Some[(Boolean, Char, Int | Long)]]]]]
   }
-
+  

@@ -9,8 +9,14 @@ private[equality] object TypesafeIterableOnceExtension extends TypesafeIterableO
 
   trait TypesafeRootIterableOnceExtension:
     extension[A, I <: collection.IterableOnce[A]] (iterableOnce: I)
-      @deprecated("Use .iterator.sameElements_safe instead", "2.13.0")
-      inline def sameElements_safe[B >: A](that: IterableOnce[B])
-                                          (using CanEqual[A, B], CanEqual[B, A]): Boolean = iterableOnce.sameElements(that)
+
+      /**
+       * Equality-safe alternative to the sameElements() method.
+       *
+       * @see [[https://github.com/antognini/type-safe-equality/tree/main#collection-extensions Library documentation]]
+       */
+      @deprecated("Use .iterator.sameElements_eq instead", "2.13.0")
+      inline def sameElements_eq[B >: A](that: IterableOnce[B])
+                                        (using CanEqual[A, B], CanEqual[B, A]): Boolean = iterableOnce.sameElements(that)
 
 end TypesafeIterableOnceExtension

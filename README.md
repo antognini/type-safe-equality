@@ -1,10 +1,14 @@
-**Scala 3 type safe equality**
+**Type safe equality for Scala 3**
 
-Provides type safe equality features allowing developers to fully leverage compiler strict equality support.
+This library aims to prevent compilation of code comparing arbitrary values unless equality is specifically supported for their respective types.
 
-This makes equality behave in a standard and intuitive way equivalent to other modern programming languages, like [std::cmp::Eq](https://doc.rust-lang.org/beta/std/cmp/trait.Eq.html) for Rust or [Data.Eq](https://hackage.haskell.org/package/base-4.18.0.0/docs/Data-Eq.html) for Haskell.
+* Any operations adhering to the principle above are considered to be **equality-safe**.
+* A `Product` type (case class, enum, tuple) can support equality only if the types of all its fields support equality.
 
-* [Eq type class](#eq-type-class) - strict equality type class with automatic derivation for case classes
+This makes equality behave like using [Data.Eq](https://hackage.haskell.org/package/base-4.18.0.0/docs/Data-Eq.html) in Haskell or [std::cmp::Eq](https://doc.rust-lang.org/beta/std/cmp/trait.Eq.html) in Rust.
+
+The following features are provided based on the compiler [strict equality](https://docs.scala-lang.org/scala3/book/ca-multiversal-equality.html#allowing-the-comparison-of-class-instances) support:
+* [Eq type class](#eq-type-class) - strict equality type class with automatic derivation for `Product` types
 * [Standard Eq instances](#standard-eq-instances) - equality type class instances for relevant Java and Scala standard library types
 * [Collection extensions](#collection-extensions) - equality-safe extension methods for standard Scala collections
 * [Strict equality opt-out](#strict-equality-opt-out) - escape hatch to enable universal equality within a specific scope
@@ -12,11 +16,12 @@ This makes equality behave in a standard and intuitive way equivalent to other m
 
 <br/>
 
-![](https://github.com/antognini/type-safe-equality/blob/main/site/example-ide-1a.png)
+![](https://github.com/antognini/type-safe-equality/blob/main/site/example-ide-1h.png)
 
 <br/>
 
-A motivation for the library can be found [here](#motivation), and further considerations on strict equality are discussed [here](#strict-equality-considerations). 
+Please see the [motivation](#motivation), [FAQ](#faq) and [further considerations](#strict-equality-considerations) on strict equality for additional information.
+
 
 # Getting started
 
@@ -24,9 +29,8 @@ This library requires **[Scala 3.3](https://scala-lang.org/blog/2023/05/30/scala
 
 Include the library dependency in your `build.sbt` and enable strict equality:
 ```scala
-libraryDependencies += "ch.produs" %% "type-safe-equality" % "0.2.0"
+libraryDependencies += "ch.produs" %% "type-safe-equality" % "0.3.0"
 
-// Not absolutely necessary but strongly recommended
 scalacOptions += "-language:strictEquality"
 ```
 Try it out!
@@ -47,22 +51,24 @@ Attributes() == Attributes()
 // Derive equality for a product type
 case class Box[A: Eq](
   name: String,
-  item: A
+  item: Either[String, A],
 ) derives Eq
-val box = Box("my box", Attributes())
+val box = Box("my box", Right(Attributes()))
 box == box
 
 // Use an equality-safe alternative to .contains()
 val names = List(now, now)
-names.contains_safe(now)
+names.contains_eq(now)
 ```
 
 # Features
+
 The examples shown below assume strict equality enabled (unless otherwise stated).
 
 ## Eq type class
+
 [Eq](https://github.com/antognini/type-safe-equality/blob/main/main/src/main/scala/equality/Eq.scala) 
-is a type class providing type safe use of the `==` and `!=` operators.
+is a type class providing type safe use of the `==` and `!=` operators and verification of equality safety for composed data types.
 
 Eq instances can be obtained in the following ways:
 
@@ -74,7 +80,7 @@ Eq instances can be obtained in the following ways:
   * `derives Eq.assumed`
   * `given Eq[X] = Eq.assumed`
 
-**Note**: It is recommended to use the assumed equality only if the verification is not possible.
+**Note**: It is recommended to assume equality only if it is not possible to verify it.
 
 
 ### Verifying equality
@@ -91,7 +97,7 @@ case class Person(
   contact: Email,
 ) derives Eq
 
-val person = Person("Alice", Email("alice@behappy.com"))
+val person = Person("Alice", Email("alice@maluma.osw"))
 
 // Only compiles because class Person derives Eq
 person == person
@@ -110,7 +116,7 @@ case class Person[A: Eq](
 ) derives Eq
 
 // Only compiles because class Email derives Eq
-val person = Person("Alice", Email("alice@behappy.com"))
+val person = Person("Alice", Email("alice@maluma.osw"))
 
 person == person
 ```
@@ -136,9 +142,9 @@ abstract class Animal
 case class Cat() extends Animal derives Eq.assumed
 case class Dog() extends Animal derives Eq.assumed
 
-// Values of type Cat can compare each other with == and != 
-// Values of type Dog can compare each other with == and != 
-// Within this hierarchy, any other comparison with == and != fails
+// Values of type Cat can compare each other with == or != 
+// Values of type Dog can compare each other with == or != 
+// Within this hierarchy, any other comparison with == or != fails
 ```
 
 Assumed equality for the base class of a class hierarchy via type class derivation:
@@ -149,7 +155,7 @@ abstract class Animal derives Eq.assumed
 case class Cat() extends Animal
 case class Dog() extends Animal
 
-// Within this hierarchy, any value can compare to any other value with == and !=
+// Within this hierarchy, any value can compare to any other value with == or !=
 ```
 
 Assumed equality for an existing arbitrary class with a given: 
@@ -201,7 +207,7 @@ case class MyClass[A: Eq, B: Eq, C: Eq, D: Eq](
 
 ## Standard Eq instances
 
-This library provides **[Eq type class instances](StandardEqInstances.md)** for selected Java and Scala standard library types.
+This library provides **[Eq type class instances](site/StandardEqInstances.md)** for selected Java and Scala standard library types.
 
 Standard type class `Eq` instances work out of the box and provide type safe equality at no cost
 
@@ -274,16 +280,16 @@ This library provides the following equality-safe alternatives for such methods:
 
 | Collection types                                                                                                                                                                                                                | Original method     | Equality-safe method     |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|--------------------------|
-| [Seq](https://scala-lang.org/api/3.x/scala/collection/Seq.html) , [Iterator](https://scala-lang.org/api/3.x/scala/collection/Iterator.html)                                                                                     | `.contains`         | `.contains_safe`         |
-| [Seq](https://scala-lang.org/api/3.x/scala/collection/Seq.html)                                                                                                                                                                 | `.containsSlice`    | `.containsSlice_safe`    |
-| [Seq](https://scala-lang.org/api/3.x/scala/collection/Seq.html)                                                                                                                                                                 | `.diff`             | `.diff_safe`             |
-| [Seq](https://scala-lang.org/api/3.x/scala/collection/Seq.html) , [Iterator](https://scala-lang.org/api/3.x/scala/collection/Iterator.html)                                                                                     | `.indexOf`          | `.indexOf_safe`          |
-| [Seq](https://scala-lang.org/api/3.x/scala/collection/Seq.html)                                                                                                                                                                 | `.indexOfSlice`     | `.indexOfSlice_safe`     |
-| [Seq](https://scala-lang.org/api/3.x/scala/collection/Seq.html)                                                                                                                                                                 | `.intersect`        | `.intersect_safe`        |
-| [Seq](https://scala-lang.org/api/3.x/scala/collection/Seq.html)                                                                                                                                                                 | `.lastIndexOf`      | `.lastIndexOf_safe`      |
-| [Seq](https://scala-lang.org/api/3.x/scala/collection/Seq.html)                                                                                                                                                                 | `.lastIndexOfSlice` | `.lastIndexOfSlice_safe` |
-| [Seq](https://scala-lang.org/api/3.x/scala/collection/Seq.html) , [Iterator](https://scala-lang.org/api/3.x/scala/collection/Iterator.html),  [IterableOnce](https://scala-lang.org/api/3.x/scala/collection/IterableOnce.html) | `.sameElements`     | `.sameElements_safe`     |
-| [Seq](https://scala-lang.org/api/3.x/scala/collection/Seq.html)                                                                                                                                                                 | `.search`           | `.search_safe`           |
+| [Seq](https://scala-lang.org/api/3.x/scala/collection/Seq.html) , [Iterator](https://scala-lang.org/api/3.x/scala/collection/Iterator.html)                                                                                     | `.contains`         | `.contains_eq`         |
+| [Seq](https://scala-lang.org/api/3.x/scala/collection/Seq.html)                                                                                                                                                                 | `.containsSlice`    | `.containsSlice_eq`    |
+| [Seq](https://scala-lang.org/api/3.x/scala/collection/Seq.html)                                                                                                                                                                 | `.diff`             | `.diff_eq`             |
+| [Seq](https://scala-lang.org/api/3.x/scala/collection/Seq.html) , [Iterator](https://scala-lang.org/api/3.x/scala/collection/Iterator.html)                                                                                     | `.indexOf`          | `.indexOf_eq`          |
+| [Seq](https://scala-lang.org/api/3.x/scala/collection/Seq.html)                                                                                                                                                                 | `.indexOfSlice`     | `.indexOfSlice_eq`     |
+| [Seq](https://scala-lang.org/api/3.x/scala/collection/Seq.html)                                                                                                                                                                 | `.intersect`        | `.intersect_eq`        |
+| [Seq](https://scala-lang.org/api/3.x/scala/collection/Seq.html)                                                                                                                                                                 | `.lastIndexOf`      | `.lastIndexOf_eq`      |
+| [Seq](https://scala-lang.org/api/3.x/scala/collection/Seq.html)                                                                                                                                                                 | `.lastIndexOfSlice` | `.lastIndexOfSlice_eq` |
+| [Seq](https://scala-lang.org/api/3.x/scala/collection/Seq.html) , [Iterator](https://scala-lang.org/api/3.x/scala/collection/Iterator.html),  [IterableOnce](https://scala-lang.org/api/3.x/scala/collection/IterableOnce.html) | `.sameElements`     | `.sameElements_eq`     |
+| [Seq](https://scala-lang.org/api/3.x/scala/collection/Seq.html)                                                                                                                                                                 | `.search`           | `.search_eq`           |
 
 
 **Note**: [Set](https://scala-lang.org/api/3.x/scala/collection/Set.html) and [Map](https://scala-lang.org/api/3.x/scala/collection/Map.html) are generally equality-safe because they use invariant type parameters.
@@ -309,7 +315,7 @@ val cars = List(carX, carY)
 apples.contains(carX)
 // Type checks but it shouldn't --> yields false
 
-apples.contains_safe(carX) 
+apples.contains_eq(carX) 
 // ERROR: Values of types A and A cannot be compared with == or !=
 //        where: A is a type variable with constraint >: Apple | Car
 
@@ -317,7 +323,7 @@ apples.contains_safe(carX)
 apples.diff(cars)      
 // Type checks but it shouldn't --> returns the original list
 
-apples.diff_safe(cars)
+apples.diff_eq(cars)
 // ERROR: Values of types Apple and Apple | Car cannot be compared with == or !=
 ```
 
@@ -377,115 +383,11 @@ today equalRef now
 // ERROR: Found (now : LocalDateTime); Required: LocalDate
 ```
 
-# Motivation
-
-Excluding some elementary types, strict equality disallows values of the same type from comparing each other with `==` and `!=` *out of the box*.
-At first sight this may be seen as an unneeded complication with no benefits, but it provides an additional level of type safety.
-
-For example, it can be problematic to compare functions with `==`:
-```scala
-type F = Int => Int
-val f1:F = (x:Int) => x + 1
-val f2:F = (x:Int) => x + 1
-
-// Compiles with strict equality disabled
-// Returns the same as f1 eq f2 (comparison for reference equality, not value equality)
-f1 == f2
-```
-
-What is the intention behind `f1 == f2`: to compare reference equality (which should evaluate to `false`), or to compare functional equality (which should evaluate to `true`)? 
-There is no way to compare functional equality in Scala, so it could possibly be a programming error. With strict equality checking enabled, the compiler can help assist in identifying such cases:
-```scala
-// Strict equality enabled
-f1 == f2 
-// ERROR: Values of types F and F cannot be compared with == or !=
-```
-If the intention is to compare the functions for [reference equality](#reference-equality), it can be done with `f1 equalRef f2` or by *locally* allowing `f1 == f2` (after realizing `==` boils down to reference equality).
-Similar pitfalls may happen for traits `Future`, `Promise`, `ServerSocket` and other structures which are critical to equal with `==` and `!=`.
-
-However, it can become tedious to declare strict equality type class instances for types like `Array`, `LocalDate`, `File`, or `Duration` (either Scala or Java `Duration`), which is one of the motivations for this library.
-
 # Strict equality considerations
-
-## Using type parameters for numbers
-
-Scala allows to freely compare values of types `Byte`, `Char`, `Short`, `Int`, `Long`, `BigInt`, `Float`, `Double`, `BigDecimal` for equality with one another, also in strict equality enabled:
-
-```scala
-1 == 1L
-```
-
-Invariant type parameters number composition with `CanEqual`:
-```scala
-// Invariant type parameter A
-case class Box[A](a: A) derives CanEqual
-
-// Compiles out of the box
-Box(1) == Box(1L)
-```
-
-Invariant type parameter number composition failure with `Eq`:
-```scala
-import equality.{*, given}
-
-// Invariant type parameter A
-case class Box[A: Eq](a: A) derives Eq
-
-Box(1) == Box(1L)
-// ERROR: Values of types Box[Int] and Box[Long] cannot be compared with == or !=.
-```
-
-Invariant type parameter number composition with `Eq`:
-```scala
-import equality.{*, given}
-
-// Invariant type parameter A
-case class Box[A: Eq](a: A) derives Eq, CanEqual
-
-// Compiles because class Box additionally derives CanEqual 
-Box(1) == Box(1L)
-```
-
-Covariant type parameter number composition with `Eq`:
-```scala
-import equality.{*, given}
-
-// Covariant type parameter A
-case class Box[+A: Eq](a: A) derives Eq
-
-// Compiles without CanEqual because type parameter A is covariant and an instance of
-// Eq[Box[AnyNumber]] (-> see explanation below)
-// is available and can be applied both to Eq[Box[Int]] and Eq[Box[Long]].
-Box(1) == Box(1L)
-```
-
-The example above (with covariant type parameter A) works because the library defines an `Eq` instance for the union of all number types:
-```scala
-package equality.scala_
-
-type AnyNumber = Byte | Char | Short | Int | Long | BigInt | Float | Double | BigDecimal
-given scala_AnyNumber: Eq[AnyNumber] = Eq.assumed
-```
-
-Another example with a covariant type parameter:
-```scala
-import equality.{*, given}
-
-// Covariant type parameter A
-case class Box[+A: Eq](a: A) derives Eq
-
-val box1 = Box(Seq(Some( (true, 'a', 1  ) )))
-val box2 = Box(Seq(Some( (true, 'a', 1L ) )))
-
-// Compiles because type parameter A is covariant and an instance of
-// Eq[ Box[Seq[Option[ (Boolean, Char, AnyNumber) ]]] ]
-// is available and can be applied both to Eq[box1.type] and Eq[box2.type].
-box1 == box2
-```
 
 ## Type Any
 
-Using `Any` as part of any type declaration with strict equality enabled will cause that type not to be comparable with `==` and `!=`.  
+Using `Any` as part of any type declaration with strict equality enabled will cause that type not to be comparable with `==` or `!=`.  
 
 ## Enums
 
@@ -497,12 +399,11 @@ import equality.{*, given}
 
 enum Weekday derives Eq:
   // These are instances of the product type Weekday
-  case Monday, Tuesday, Wednesday, // ...
+  case Monday, Tuesday, Wednesday // ...
 
 // Only compiles because enum Weekday derives Eq
 val myDay: Weekday = Weekday.Monday
 myDay == myDay
-
 ```
 
 ## Checking strict equality build settings
@@ -516,30 +417,71 @@ import equality.{*, given}
 checkStrictEqualityBuild()
 ```
 
-# Limitations
 
-## Missing constructor type decomposition 
+# FAQ
 
-In the example below, the `Eq` type class derivation does not decompose the constructor parameter type `Seq[B]` to check if it contains type parameters (it actually contains type parameter `B`).
-This will be corrected in the next release.
+## What is the relation between `Eq` and `CanEqual`?
 
+Each instance of `Eq` type class produces an instance of `CanEqual` thus making it compatible with established strict equality support in the Scala compiler.
+
+
+## Is `CanEqual` good enough to model equality?
+
+`CanEqual` is a fairly low-level marker mechanism with following limitations:
+
+* `CanEqual` does not support compile-time verification of equality safety for product types composed from other equality-safe types.
+* `CanEqual` given instances are automatically provided for a few basic standard library types but for nothing else.
+
+Composition example with `CanEqual` not failing as it should:
 ```scala
-// [B: Eq] should be enforced, too
-case class Box[A: Eq, B](
-  a: A,
-  b: Seq[B]
-) derives Eq
+case class A()
 
-case class Cup() derives Eq
-case class Spoon() // no derives
+// Compiles but should not compile since member type A neither derives CanEqual nor is there a given CanEqual instance for it
+case class B(a: A) derives CanEqual
 
-// Error should be detected here, but it is not because of the missing [B: Eq]
-val box = Box( Cup(), Seq( Spoon()))
-
-// The operator correctly fails, but the error is reported too late in the compilation process 
-box == box
-// ERROR: Values of types Box[Cup, Spoon] and Box[Cup, Spoon] cannot be compared with == or !=.
+B(A()) == B(A())
 ```
+
+## Why does `CanEqual[-L, -R]` have two type parameters and `Eq[-T]` only one ?
+
+See the motivation for `CanEqual[-L, -R]` in the documentation about [Scala 3 equality](https://docs.scala-lang.org/scala3/reference/contextual/multiversal-equality.html).
+
+This library focuses on strict equality and therefore the `Eq` type class can be expressed with a single type parameter.
+
+
+## Why is the type parameter in `Eq` contravariant ?
+
+`Eq[-T]` reflects the principle by which `given Eq[A]` allows any equality comparison between values of type `A` or any type more specialized than `A`.
+
+* For type `B` which extends type `A`, `given Eq[A]` allows pairwise comparison between values of `A` or `B`.
+* For unrelated types `A` and `B`, `given Eq[A | B]` allows pairwise comparison between values of `A`, `B` or `A | B`.
+* For unrelated types `A` and `B`, `given Eq[A]` allows pairwise comparison between values of `A`, or `A & B`.
+
+
+## Why do `enum` types need to derive `Eq` to be equality-safe ?
+
+It does not seem to be possible to create given Eq instances for enum types automatically in Scala 3 without using a compiler plugin.
+
+
+## Why does comparing two instances of the same class using different numeric type parameters not compile ?
+
+This library follows a principle that values of different types are not comparable. 
+This includes numeric types so this is a feature and not a bug.
+
+Contrary to this principle, the compiler makes values of numeric types universally comparable even with strict equality enabled.
+
+If universal equality for case classes parameterized with different numeric types is required, the following method can be used: 
+```scala
+import equality.{*, given}
+
+case class Box[A: Eq](a: A) derives Eq, CanEqual
+
+// Compiles because class Box additionally derives CanEqual 
+Box(1) == Box(2L)
+```
+
+##
+
 
 Special thanks to
 * **Martin Ockajak**
