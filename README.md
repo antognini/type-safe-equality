@@ -20,7 +20,7 @@ The following features are provided based on the compiler [strict equality](http
 
 <br/>
 
-Please see the [motivation](#motivation), [FAQ](#faq) and [further considerations](#strict-equality-considerations) on strict equality for additional information.
+Please see the [FAQ](#faq) and [further considerations](#strict-equality-considerations) on strict equality for additional information.
 
 
 # Getting started
