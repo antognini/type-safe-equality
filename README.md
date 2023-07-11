@@ -32,11 +32,11 @@ Include the library dependency in your `build.sbt` and enable strict equality:
 libraryDependencies += "ch.produs" %% "type-safe-equality" % "0.3.0"
 
 scalacOptions += "-language:strictEquality"
+scalacOptions += "-Yimports:scala,scala.Predef,java.lang,equality.all"
 ```
 Try it out!
 
 ```scala
-import equality.{*, given}
 import java.time.LocalDateTime
 import java.util.jar.Attributes
 
@@ -75,7 +75,7 @@ Eq instances can be obtained in the following ways:
 * By asking the compiler to **verify** (derive) equality safety
   * `derives Eq` 
   * `given Eq[X] = Eq.derived`
-
+    
 * By telling the compiler to **assume** equality safety (fallback with no checking)
   * `derives Eq.assumed`
   * `given Eq[X] = Eq.assumed`
@@ -87,8 +87,6 @@ Eq instances can be obtained in the following ways:
 
 Verified equality for composed case classes via type class derivation:
 ```scala
-import equality.{*, given}
-
 case class Email( address:String) derives Eq
 
 // Only compiles because class Email derives Eq
@@ -105,8 +103,6 @@ person == person
 
 Verified equality for composed case classes with type parameters via type class derivation:
 ```scala
-import equality.{*, given}
-
 case class Email( address:String) derives Eq
 
 // Only compiles because the type parameter A is declared with a context bound [A: Eq]
@@ -123,8 +119,6 @@ person == person
 
 Verified equality for an existing arbitrary class with a given using the same derivation mechanism:
 ```scala
-import equality.{*, given}
-
 // Only compiles because SomeProduct conforms to the equality rules
 given Eq[SomeProduct] = Eq.derived
 
@@ -132,12 +126,11 @@ given Eq[SomeProduct] = Eq.derived
 SomeProduct() == SomeProduct()
 ```
 
+
 ### Assuming equality
 
 Assumed equality for the bottom classes of a class hierarchy via type class derivation:
 ```scala
-import equality.{*, given}
-
 abstract class Animal
 case class Cat() extends Animal derives Eq.assumed
 case class Dog() extends Animal derives Eq.assumed
@@ -149,8 +142,6 @@ case class Dog() extends Animal derives Eq.assumed
 
 Assumed equality for the base class of a class hierarchy via type class derivation:
 ```scala
-import equality.{*, given}
-
 abstract class Animal derives Eq.assumed
 case class Cat() extends Animal
 case class Dog() extends Animal
@@ -160,7 +151,6 @@ case class Dog() extends Animal
 
 Assumed equality for an existing arbitrary class with a given: 
 ```scala
-import equality.{*, given}
 import java.util.jar.Attributes
 
 // Always compiles
@@ -214,7 +204,6 @@ Standard type class `Eq` instances work out of the box and provide type safe equ
 **Note**: `Eq` instances are provided only for those standard library types where equality operation is guaranteed to make sense.
 
 ```scala
-import equality.{*, given}
 import java.time.{LocalDate, LocalDateTime}
 
 val now = LocalDateTime.now
@@ -251,8 +240,6 @@ import equality.java_time_LocalDate
 ### Creating your group of equality type class instances
 ```scala
 package mypackage
-import equality.{*, given}
-
 // All Eq defined for package java.util + other 3 predefined + 1 on your own
 object MyEqInstances:
 
@@ -298,8 +285,6 @@ This library provides the following equality-safe alternatives for such methods:
 
 An example of using equality-safe collection methods:
 ```scala
-import equality.{*, given}
-
 case class Apple(x: String) derives Eq
 val appleA = Apple("A")
 val appleB = Apple("B")
@@ -363,7 +348,6 @@ val myThing = MyThing()
 
 Equality-safe reference comparison:
 ```scala
-import equality.{*, given}
 import java.time.{LocalDate, LocalDateTime}
 
 val today = LocalDate.now
@@ -395,8 +379,6 @@ Enums are products and therefore equality can be obtained via `Eq` type class de
 
 
 ```scala
-import equality.{*, given}
-
 enum Weekday derives Eq:
   // These are instances of the product type Weekday
   case Monday, Tuesday, Wednesday // ...
@@ -411,8 +393,6 @@ myDay == myDay
 To guarantee the build has `-language:strictEquality` enabled, include this in your sources:
 
 ```scala
-import equality.{*, given}
-
 // Does not need to be called, it fails to compile with strict equality turned off
 checkStrictEqualityBuild()
 ```
@@ -472,8 +452,6 @@ Contrary to this principle, the compiler makes values of numeric types universal
 
 If universal equality for case classes parameterized with different numeric types is required, the following method can be used: 
 ```scala
-import equality.{*, given}
-
 case class Box[A: Eq](a: A) derives Eq, CanEqual
 
 // Compiles because class Box additionally derives CanEqual 

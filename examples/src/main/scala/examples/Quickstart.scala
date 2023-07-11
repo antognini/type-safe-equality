@@ -20,7 +20,6 @@ import scala.annotation.nowarn
 
 
 def getting_started: Unit =
-  import equality.{*, given}
   import java.time.LocalDateTime
   import java.util.jar.Attributes
 
@@ -47,7 +46,6 @@ def getting_started: Unit =
 
 @nowarn
 def verified_equality_for_composed_case_classes_via_type_class_derivation: Unit =
-  import equality.{*, given}
 
   case class Email( address:String) derives Eq
 
@@ -65,7 +63,6 @@ def verified_equality_for_composed_case_classes_via_type_class_derivation: Unit 
 
 @nowarn
 def verified_equality_for_composed_case_classes_with_type_parameters_via_type_class_derivation: Unit =
-  import equality.{*, given}
 
   case class Email( address:String) derives Eq
 
@@ -83,7 +80,6 @@ def verified_equality_for_composed_case_classes_with_type_parameters_via_type_cl
 case class SomeProduct()
 @nowarn
 def verified_equality_for_an_existing_arbitrary_class_with_a_given: Unit =
-  import equality.{*, given}
 
   // Only compiles because SomeProduct conforms to the equality rules
   given Eq[SomeProduct] = Eq.derived
@@ -94,7 +90,6 @@ def verified_equality_for_an_existing_arbitrary_class_with_a_given: Unit =
 
 @nowarn
 def assumed_equality_for_the_bottom_classes_of_a_class_hierarchy_via_type_class_derivation: Unit =
-  import equality.{*, given}
 
   abstract class Animal
   case class Cat() extends Animal derives Eq.assumed
@@ -107,7 +102,6 @@ def assumed_equality_for_the_bottom_classes_of_a_class_hierarchy_via_type_class_
 
 @nowarn
 def assumed_equality_for_the_base_class_of_a_class_hierarchy_via_type_class_derivation: Unit =
-  import equality.{*, given}
 
   abstract class Animal derives Eq.assumed
   case class Cat() extends Animal
@@ -118,7 +112,7 @@ def assumed_equality_for_the_base_class_of_a_class_hierarchy_via_type_class_deri
 
 @nowarn
 def assumed_equality_for_an_existing_arbitrary_class_with_a_given: Unit =
-  import equality.{*, given}
+
   import java.util.jar.Attributes
 
   // Always compiles
@@ -130,7 +124,7 @@ def assumed_equality_for_an_existing_arbitrary_class_with_a_given: Unit =
 
 @nowarn
 def standardEqInstances: Unit =
-  import equality.{*, given}
+
   import java.time.{LocalDate, LocalDateTime}
 
   val now = LocalDateTime.now
@@ -147,7 +141,6 @@ def standardEqInstances: Unit =
 
 @nowarn
 def collectionExtension:Unit =
-  import equality.{*, given}
 
   case class Apple(x: String) derives Eq
   val appleA = Apple("A")
@@ -197,7 +190,6 @@ def strict_equality_opt_out_for_a_local_scope: Unit =
 
 @nowarn
 def referenceEquality: Unit =
-  import equality.{*, given}
   import java.time.{LocalDate, LocalDateTime}
 
   val today = LocalDate.now
@@ -218,7 +210,6 @@ def referenceEquality: Unit =
 
 
 def numberEquality: Unit =
-  import equality.{*, given}
 
   // Covariant type parameter A
   case class Box[+A: Eq](a: A) derives Eq
@@ -234,7 +225,6 @@ def numberEquality: Unit =
 
 @nowarn
 def enums:Unit =
-  import equality.{*, given}
 
   enum Weekday derives Eq:
     // These are instances of the product type Weekday

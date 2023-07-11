@@ -5,7 +5,7 @@ ThisBuild / organizationHomepage := None
 ThisBuild / description := "Scala 3 type safe equality"
 ThisBuild / homepage := Some(url("https://github.com/antognini/type-safe-equality"))
 ThisBuild / licenses := Seq("Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0"))
-ThisBuild / version := "0.3.0"
+ThisBuild / version := "0.4.0"
 ThisBuild / scalaVersion := "3.3.0"
 ThisBuild / versionScheme := Some("semver-spec")
 ThisBuild / publishTo := sonatypePublishToBundle.value
@@ -29,22 +29,22 @@ lazy val compileOptions = Seq(
   "-new-syntax",
   "-indent",
   "-language:strictEquality",
-  "-java-output-version", "11",
-  "-Wunused:all"
+  "-java-output-version", "11"
+//  "-Wunused:all"
 )
 
 lazy val root = project
   .in(file("."))
-  .dependsOn(main)
+  .dependsOn(eq)
   .settings(
     name := "type-safe-equality",
     publish / skip := true,
     Compile / scalacOptions ++= compileOptions
   )
-  .aggregate(main, examples)
+  .aggregate(eq, examples)
 
-lazy val main = project
-  .in(file("main"))
+lazy val eq = project
+  .in(file("eq"))
   .settings(
     libraryDependencies ++= Seq(
       "org.scalatest" %% "scalatest" % "3.2.16" % "test"
@@ -55,10 +55,11 @@ lazy val main = project
 
 lazy val examples = project
   .in(file("examples"))
-  .dependsOn(main)
+  .dependsOn(eq)
   .settings(
     publish / skip := true,
-    Compile / scalacOptions ++= compileOptions
+    Compile / scalacOptions ++= compileOptions,
+    Compile / scalacOptions += "-Yimports:scala,scala.Predef,java.lang,equality.all"
   )
 
 // Publish
