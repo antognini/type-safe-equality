@@ -23,7 +23,26 @@ The following features are provided based on the compiler [strict equality](http
 Please see the [FAQ](#faq) and [further considerations](#strict-equality-considerations) on strict equality for additional information.
 
 
-# Getting started
+# Quickstart
+
+## New Project
+
+```scala
+sbt new antognini/type-safe-equality.g8
+cd type-safe-equality-example
+sbt run
+```
+
+## REPL
+
+Execute any of the examples by copy & paste them in REPL:
+```scala
+sbt new antognini/type-safe-equality.g8
+cd type-safe-equality-example
+sbt console
+```
+
+## Embed in your project
 
 This library requires **[Scala 3.3](https://scala-lang.org/blog/2023/05/30/scala-3.3.0-released.html)+** on **[Java 11](https://en.wikipedia.org/wiki/Java_version_history)+**. 
 
@@ -34,7 +53,8 @@ libraryDependencies += "ch.produs" %% "type-safe-equality" % "0.4.0"
 scalacOptions += "-language:strictEquality"
 scalacOptions += "-Yimports:scala,scala.Predef,java.lang,equality.all"
 ```
-Try it out!
+
+## Try it out!
 
 ```scala
 import java.time.LocalDateTime
@@ -218,47 +238,6 @@ today == now
 // ERROR: Values of types LocalDate and LocalDateTime cannot be compared with == or !=
 ```
 
-### Selective Eq instance import
-
-```scala
-// All equality type class instances
-import equality.given
-
-// All Scala equality type class instances
-import equality.scala_all.given
-
-// All Java equality type class instances
-import equality.java_all.given
-
-// All equality type class instances for package java.time 
-import equality.java_time.given
-
-// Equality type class instance for java.time.LocalDate
-import equality.java_time_LocalDate
-```
-
-### Creating your group of equality type class instances
-```scala
-package mypackage
-// All Eq defined for package java.util + other 3 predefined + 1 on your own
-object MyEqInstances:
-
-   // Package level wildcard exports (.* and .given) are not allowed in Scala, EqInstances.given must be used
-   export equality.java_util.EqInstances.given
-   
-   export equality.java_io_File
-   export equality.java_nio_file_Path
-   export equality.scala_Array
-   
-   given Eq[java.util.jar.Attributes] = Eq.assumed
-```
-
-subsequently, use `MyEqInstances` anywhere with
-```scala
-import mypackage.MyEqInstances.given
-```
-
-
 ## Collection extensions
 
 Certain methods of specific standard library collection types (and their subtypes) are not equality-safe.
@@ -366,6 +345,73 @@ today notEqualRef today
 today equalRef now
 // ERROR: Found (now : LocalDateTime); Required: LocalDate
 ```
+
+
+# Library feature selection
+
+This library relies on compiler imports to facilitate working on equality without imports in your code. However, you can choose which features you want to make available in your code. 
+
+## All-in-one
+
+```scala
+scalacOptions += "-Yimports:scala,scala.Predef,java.lang,equality.all"
+```
+
+## Minimal
+
+With this setup you will only see the two basic classes of this library in your code. Everything else needs to be explicitly imported:
+
+```scala
+scalacOptions += "-Yimports:scala,scala.Predef,java.lang,equality"
+```
+Now you need to import every feature you want to use:
+
+```scala
+// All Scala equality type class instances
+import equality.scala_all.given
+
+// All Java equality type class instances
+import equality.java_all.given
+
+// All equality type class instances for package java.time 
+import equality.java_time.given
+
+// Equality type class instance for java.time.LocalDate
+import equality.java_time.java_time_LocalDate
+
+// Equality-safe collection extension
+import equality.scala_collection.CollectionExtension.*
+```
+## Customized
+
+```scala
+scalacOptions += "-Yimports:scala,scala.Predef,java.lang,equality"
+```
+Now you can define an import object:
+```scala
+object MyEq {
+  // all Eq instances for scala.*
+  export equality.scala_all.EqInstances.given
+
+  // all Eq instances for java.util.*
+  export equality.java_util.EqInstances.given
+
+  // Eq instance for java.io.File
+  export equality.java_io.java_io_File
+
+  // Eq instance for java.nio.file.Path
+  export equality.java_nio_file.java_nio_file_Path
+
+  // additionally defined Eq instance 
+  given Eq[java.util.jar.Attributes] = Eq.assumed
+}
+```
+
+subsequently, use `MyEq` anywhere with
+```scala
+import MyEq.{*, given}
+```
+
 
 # Strict equality considerations
 
