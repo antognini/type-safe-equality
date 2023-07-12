@@ -75,6 +75,7 @@ def verified_equality_for_composed_case_classes_with_type_parameters_via_type_cl
   // Only compiles because class Email derives Eq
   val person = Person("Alice", Email("alice@maluma.osw"))
 
+  // Only compiles because class Person derives Eq
   person == person
 
 case class SomeProduct()

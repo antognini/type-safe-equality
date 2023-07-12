@@ -20,7 +20,7 @@ The following features are provided based on the compiler [strict equality](http
 
 <br/>
 
-Please see the [FAQ](#faq) and [further considerations](#strict-equality-considerations) on strict equality for additional information.
+Please see the [FAQ](#faq) for additional information.
 
 
 # Quickstart
@@ -107,7 +107,7 @@ Eq instances can be obtained in the following ways:
 
 Verified equality for composed case classes via type class derivation:
 ```scala
-case class Email( address:String) derives Eq
+case class Email(address: String) derives Eq
 
 // Only compiles because class Email derives Eq
 case class Person(
@@ -123,7 +123,7 @@ person == person
 
 Verified equality for composed case classes with type parameters via type class derivation:
 ```scala
-case class Email( address:String) derives Eq
+case class Email(address: String) derives Eq
 
 // Only compiles because the type parameter A is declared with a context bound [A: Eq]
 case class Person[A: Eq](
@@ -134,16 +134,19 @@ case class Person[A: Eq](
 // Only compiles because class Email derives Eq
 val person = Person("Alice", Email("alice@maluma.osw"))
 
+// Only compiles because class Person derives Eq
 person == person
 ```
 
 Verified equality for an existing arbitrary class with a given using the same derivation mechanism:
 ```scala
-// Only compiles because SomeProduct conforms to the equality rules
-given Eq[SomeProduct] = Eq.derived
+enum Weekday:
+  case Monday, Tuesday, Wednesday // ...
 
-// Only compiles with the given instance above
-SomeProduct() == SomeProduct()
+given Eq[Weekday] = Eq.derived
+
+// Only compiles because given Eq type class instance for Weekday is in scope
+Weekday.Monday == Weekday.Monday
 ```
 
 
@@ -166,7 +169,7 @@ class Animal derives Eq.assumed
 case class Cat() extends Animal
 case class Dog() extends Animal
 
-// Within this hierarchy, any value can compare to any other value with == or !=
+// Within this hierarchy, pairwise comparison with == or != between values of any type is allowed
 ```
 
 Assumed equality for an existing arbitrary class with a given: 
@@ -229,7 +232,7 @@ import java.time.{LocalDate, LocalDateTime}
 val now = LocalDateTime.now
 val later = LocalDateTime.now
 
-// Compiles out of the box
+// Only compiles because given Eq type class instance for LocalDateTime is in scope
 now == later
 
 val today = LocalDate.now
@@ -364,7 +367,7 @@ With this setup you will only see the two basic classes of this library in your 
 ```scala
 scalacOptions += "-Yimports:scala,scala.Predef,java.lang,equality"
 ```
-Now you need to import every feature you want to use:
+Import every feature you want to use:
 
 ```scala
 // All Scala equality type class instances
@@ -387,7 +390,7 @@ import equality.scala_collection.CollectionExtension.*
 ```scala
 scalacOptions += "-Yimports:scala,scala.Predef,java.lang,equality"
 ```
-Now you can define an import object:
+Define an import object:
 ```scala
 object MyEq {
   // all Eq instances for scala.*
@@ -410,37 +413,6 @@ object MyEq {
 subsequently, use `MyEq` anywhere with
 ```scala
 import MyEq.{*, given}
-```
-
-
-# Strict equality considerations
-
-## Type Any
-
-Using `Any` as part of any type declaration with strict equality enabled will cause that type not to be comparable with `==` or `!=`.  
-
-## Enums
-
-Enums are products and therefore equality can be obtained via `Eq` type class derivation.
-
-
-```scala
-enum Weekday derives Eq:
-  // These are instances of the product type Weekday
-  case Monday, Tuesday, Wednesday // ...
-
-// Only compiles because enum Weekday derives Eq
-val myDay: Weekday = Weekday.Monday
-myDay == myDay
-```
-
-## Checking strict equality build settings
-
-To guarantee the build has `-language:strictEquality` enabled, include this in your sources:
-
-```scala
-// Does not need to be called, it fails to compile with strict equality turned off
-checkStrictEqualityBuild()
 ```
 
 
@@ -484,6 +456,12 @@ This library focuses on strict equality and therefore the `Eq` type class can be
 * For unrelated types `A` and `B`, `given Eq[A]` allows pairwise comparison between values of `A`, or `A & B`.
 
 
+## Can types parametrized with `Any` support equality ?
+
+No, they don't, because they would require for the type `Any` to support equality, which would defeat the purpose.
+
+
+
 ## Why do `enum` types need to derive `Eq` to be equality-safe ?
 
 It does not seem to be possible to create given Eq instances for enum types automatically in Scala 3 without using a compiler plugin.
@@ -502,6 +480,13 @@ case class Box[A: Eq](a: A) derives Eq, CanEqual
 
 // Compiles because class Box additionally derives CanEqual 
 Box(1) == Box(2L)
+```
+
+## How to verify that strict equality is enabled in build settings ?
+
+```scala
+// Call this function anywhere in your sources
+checkStrictEqualityBuild()
 ```
 
 ##

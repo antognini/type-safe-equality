@@ -15,6 +15,7 @@ import scala.annotation.nowarn
                      contact: Email,
                    ) derives Eq:
 
+    // To be documented in README.md
     // Only compiles because enum MailPolicy derives Eq
     def mailPolicy: MailPolicy = Eq:
 
