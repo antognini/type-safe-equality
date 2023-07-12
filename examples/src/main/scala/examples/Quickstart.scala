@@ -91,7 +91,7 @@ def verified_equality_for_an_existing_arbitrary_class_with_a_given: Unit =
 @nowarn
 def assumed_equality_for_the_bottom_classes_of_a_class_hierarchy_via_type_class_derivation: Unit =
 
-  abstract class Animal
+  class Animal
   case class Cat() extends Animal derives Eq.assumed
   case class Dog() extends Animal derives Eq.assumed
 
@@ -103,7 +103,7 @@ def assumed_equality_for_the_bottom_classes_of_a_class_hierarchy_via_type_class_
 @nowarn
 def assumed_equality_for_the_base_class_of_a_class_hierarchy_via_type_class_derivation: Unit =
 
-  abstract class Animal derives Eq.assumed
+  class Animal derives Eq.assumed
   case class Cat() extends Animal
   case class Dog() extends Animal
 

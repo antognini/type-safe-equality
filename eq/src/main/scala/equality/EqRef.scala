@@ -1,14 +1,13 @@
 package equality
 
-import equality.Eq
-
+import equality.all.{Eq, given}
 
 /**
  * Equality-safe reference comparison.
  *
  * @see [[https://github.com/antognini/type-safe-equality/tree/main#reference-equality Library documentation]]
  */
-sealed trait EqRef[A <: AnyRef](
+sealed class EqRef[A <: AnyRef] private (
   private val a: Option[A]
 ) derives Eq.assumed:
 
@@ -50,13 +49,15 @@ sealed trait EqRef[A <: AnyRef](
     a match
       case Some(value) =>
         val identity = System.identityHashCode(value)
-        s"EqRef($identity -> $value)"
+        f"EqRef($identity%x -> $value)"
       case _ =>
-        s"EqRef"
+        "EqRef"
 
 end EqRef
 
 object EqRef:
-  def apply[A <: AnyRef]: EqRef[A] = new EqRef[A](None){}
-  def apply[A <: AnyRef](a: A): EqRef[A] = new EqRef[A](Some(a)){}
+  def apply[A <: AnyRef]: EqRef[A] = new EqRef[A](None)
+  def apply[A <: AnyRef](a: A): EqRef[A] = new EqRef[A](Some(a))
+
+  given [A <: AnyRef]: Eq[EqRef[A]] = Eq.assumed
 end EqRef

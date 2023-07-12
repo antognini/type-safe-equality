@@ -48,7 +48,7 @@ This library requires **[Scala 3.3](https://scala-lang.org/blog/2023/05/30/scala
 
 Include the library dependency in your `build.sbt` and enable strict equality:
 ```scala
-libraryDependencies += "ch.produs" %% "type-safe-equality" % "0.4.0"
+libraryDependencies += "ch.produs" %% "type-safe-equality" % "0.4.1"
 
 scalacOptions += "-language:strictEquality"
 scalacOptions += "-Yimports:scala,scala.Predef,java.lang,equality.all"
@@ -151,7 +151,7 @@ SomeProduct() == SomeProduct()
 
 Assumed equality for the bottom classes of a class hierarchy via type class derivation:
 ```scala
-abstract class Animal
+class Animal
 case class Cat() extends Animal derives Eq.assumed
 case class Dog() extends Animal derives Eq.assumed
 
@@ -162,7 +162,7 @@ case class Dog() extends Animal derives Eq.assumed
 
 Assumed equality for the base class of a class hierarchy via type class derivation:
 ```scala
-abstract class Animal derives Eq.assumed
+class Animal derives Eq.assumed
 case class Cat() extends Animal
 case class Dog() extends Animal
 

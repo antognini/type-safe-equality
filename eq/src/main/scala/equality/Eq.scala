@@ -17,8 +17,6 @@ sealed trait Eq[-T]:
    */
   private[equality] val violations: Seq[String] = Nil
 
-  override def toString = "Eq.derived"
-
 object Eq:
   given eq_CanEqual[T: Eq]: CanEqual[T, T] = CanEqual.derived
 
@@ -31,16 +29,13 @@ object Eq:
   object assumed extends assumed[Any]:
     def derived[T]: assumed[T] = assumed
 
-    override def toString = "Eq.assumed"
-
   /**
    * Creates an Eq instance for an arbitrary type without verifying equality requirements.
    *
    * @see [[https://github.com/antognini/type-safe-equality/blob/main/README.md#assuming-equality Library documentation]]
    * @tparam T arbitrary type
    */
-  sealed trait assumed[-T] extends Eq[T]:
-    override def toString = "Eq.assumed"
+  sealed trait assumed[-T] extends Eq[T]
 
   /**
    * Creates an Eq instance for a `Product` type while verifying equality requirements.
@@ -64,6 +59,6 @@ object Eq:
   // For testing only
   private[equality] def apply[T](violationSeq: Seq[String]): Eq[T] =
     new Eq[T]:
-      override val violations: Seq[String] = violationSeq
+      override val violations = violationSeq
 
 end Eq
