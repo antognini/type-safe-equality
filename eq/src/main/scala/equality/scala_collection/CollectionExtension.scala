@@ -1,6 +1,10 @@
 package equality.scala_collection
 
-object CollectionExtension
-  extends TypesafeIterableOnceExtension
-    with TypeSafeIteratorExtension
-    with TypeSafeSeqExtension
+object CollectionExtension extends
+  CollectionExtensionSeq,
+  CollectionExtensionSeqOverload,
+  CollectionExtensionSeqMutable,
+  CollectionExtensionSeqImmutable,
+  CollectionExtensionIterator,
+  CollectionExtensionIteratorOverload,
+  CollectionExtensionIterableOnce

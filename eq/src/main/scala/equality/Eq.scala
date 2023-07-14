@@ -1,5 +1,7 @@
 package equality
 
+import annotation.implicitNotFound
+
 export Eq.given
 
 // Marker trait for unit tests
@@ -11,6 +13,8 @@ private[equality] trait EqTest
  * @see [[https://github.com/antognini/type-safe-equality/blob/main/README.md#eq-type-class Library documentation]]
  * @tparam T `Product` type
  */
+
+@implicitNotFound("Values of types ${T} and ${T} cannot be compared with == or !=")
 sealed trait Eq[-T]:
   /**
    *  For testing only
@@ -18,6 +22,7 @@ sealed trait Eq[-T]:
   private[equality] val violations: Seq[String] = Nil
 
 object Eq:
+  given eq_from_assumed[A: Eq.assumed]: Eq[A] = Instance
   given eq_CanEqual[T: Eq]: CanEqual[T, T] = CanEqual.derived
 
 
@@ -47,14 +52,18 @@ object Eq:
   inline def derived[T]: Eq[T] = EqMacro.derived
 
 
-  // TODO Document in README, add link here
-  def apply[A: Eq](a: A): A = a
+  /**
+   * Identity function that requires an Eq type class instance for the passed argument.
+   *
+   * @see [[https://github.com/antognini/type-safe-equality/blob/main/README.md#assuming-equality Library documentation]]
+   * @tparam T arbitrary type
+   */
+  def apply[T: Eq](value: T): T = value
   
   private object Instance extends Eq[Any]
 
   private[equality] def apply[T]: Eq[T] = Instance
 
-  given eq_assumed[A: Eq.assumed]: Eq[A] = Instance
 
   // For testing only
   private[equality] def apply[T](violationSeq: Seq[String]): Eq[T] =

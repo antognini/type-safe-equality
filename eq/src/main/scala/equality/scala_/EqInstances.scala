@@ -3,40 +3,34 @@ package equality.scala_
 import equality.Eq
 
 export EqInstances.given
-export EqInstances.{AnyNumber, AnyJavaNumber}
+
+type AnyNumber = Byte | Char | Short | Int | Long | BigInt | Float | Double | BigDecimal
+
+type AnyJavaNumber = java.lang.Byte     | java.lang.Character   | java.lang.Short       |
+                     java.lang.Integer  | java.lang.Long        | java.math.BigInteger  |
+                     java.lang.Float    | java.lang.Double      | java.math.BigDecimal
 
 object EqInstances:
 
-  type AnyNumber = Byte | Char | Short | Int | Long | BigInt | Float | Double | BigDecimal
   given scala_AnyNumber: Eq[AnyNumber] = Eq.assumed
-
-  type AnyJavaNumber = java.lang.Byte     | java.lang.Character   | java.lang.Short       |
-                       java.lang.Integer  | java.lang.Long        | java.math.BigInteger  |
-                       java.lang.Float    | java.lang.Double      | java.math.BigDecimal
   given scala_AnyJavaNumber: Eq[AnyJavaNumber] = Eq.assumed
-
   given scala_AnyScalaOrJavaNumber: Eq[AnyNumber | AnyJavaNumber] = Eq.assumed
 
+  given scala_Array[T: Eq]: Eq[Array[T]] = Eq.assumed
+  given scala_Boolean: Eq[Boolean] = Eq.assumed
   given scala_Byte: Eq[Byte] = Eq.assumed
-  given scala_Short: Eq[Short] = Eq.assumed
+  given scala_Char: Eq[Char] = Eq.assumed
+  given scala_Double: Eq[Double] = Eq.assumed
+  given scala_Float: Eq[Float] = Eq.assumed
   given scala_Int: Eq[Int] = Eq.assumed
   given scala_Long: Eq[Long] = Eq.assumed
-
-  given scala_Float: Eq[Float] = Eq.assumed
-  given scala_Double: Eq[Double] = Eq.assumed
-  given scala_Boolean: Eq[Boolean] = Eq.assumed
-
-  given scala_String: Eq[String] = Eq.assumed
-  given scala_Char: Eq[Char] = Eq.assumed
-
-  given scala_Option[A: Eq]: Eq[Option[A]] = Eq.assumed
-
-  given scala_Unit: Eq[Unit] = Eq.assumed
-  given scala_Null: Eq[Null] = Eq.assumed
   given scala_Nothing: Eq[Nothing] = Eq.assumed
-
-  given scala_Array[T: Eq]: Eq[Array[T]] = Eq.assumed
-
+  given scala_Null: Eq[Null] = Eq.assumed
+  given scala_Option[A: Eq]: Eq[Option[A]] = Eq.assumed
+  given scala_Short: Eq[Short] = Eq.assumed
+  given scala_String: Eq[String] = Eq.assumed
+  given scala_Unit: Eq[Unit] = Eq.assumed
+  
   given scala_Tuple0: Eq[EmptyTuple] = Eq.assumed
   given scala_Tuple1[T1: Eq]: Eq[T1 *: EmptyTuple] = Eq.assumed
   given scala_Tuple2[T1: Eq, T2: Eq]: Eq[T1 *: T2 *: EmptyTuple] = Eq.assumed

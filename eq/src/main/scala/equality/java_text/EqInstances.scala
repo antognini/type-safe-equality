@@ -6,4 +6,4 @@ export EqInstances.given
 
 object EqInstances:
   given java_text_Collator: Eq[java.text.Collator] = Eq.assumed
-  given java_text_NumberFormat: Eq[java.text.NumberFormat] = Eq.assumed
+  given java_text_Format: Eq[java.text.Format] = Eq.assumed

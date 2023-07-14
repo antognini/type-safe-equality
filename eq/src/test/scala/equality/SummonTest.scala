@@ -1,6 +1,5 @@
 package equality
 
-import equality.scala_.EqInstances.AnyJavaNumber
 import equality.all.{*, given}
 import org.scalatest.freespec.AnyFreeSpec
 

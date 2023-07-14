@@ -14,7 +14,6 @@ import scala.annotation.nowarn
   collectionExtension
   strict_equality_opt_out_for_an_entire_compilation_unit
   strict_equality_opt_out_for_a_local_scope
-  referenceEquality
   numberEquality
   enums
 
@@ -187,27 +186,6 @@ def strict_equality_opt_out_for_a_local_scope: Unit =
 
     // Only compiles because strict equality is disabled
     x1 == x2
-
-
-@nowarn
-def referenceEquality: Unit =
-  import java.time.{LocalDate, LocalDateTime}
-
-  val today = LocalDate.now
-  val now = LocalDateTime.now
-
-  // Compiles because references are not equality-safe
-  today eq now
-
-  val eqRef = EqRef[LocalDate]
-  import eqRef.*
-
-  // Compiles because references are of the same type
-  today equalRef today
-  today notEqualRef today
-
-  // today equalRef now
-  // ERROR: Found (now : LocalDateTime); Required: LocalDate
 
 
 def numberEquality: Unit =

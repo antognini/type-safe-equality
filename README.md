@@ -12,7 +12,6 @@ The following features are provided based on the compiler [strict equality](http
 * [Standard Eq instances](#standard-eq-instances) - equality type class instances for relevant Java and Scala standard library types
 * [Collection extensions](#collection-extensions) - equality-safe extension methods for standard Scala collections
 * [Strict equality opt-out](#strict-equality-opt-out) - escape hatch to enable universal equality within a specific scope
-* [Reference equality](#reference-equality) - equality-safe reference comparison
 
 <br/>
 
@@ -48,7 +47,7 @@ This library requires **[Scala 3.3](https://scala-lang.org/blog/2023/05/30/scala
 
 Include the library dependency in your `build.sbt` and enable strict equality:
 ```scala
-libraryDependencies += "ch.produs" %% "type-safe-equality" % "0.4.1"
+libraryDependencies += "ch.produs" %% "type-safe-equality" % "0.5.0"
 
 scalacOptions += "-language:strictEquality"
 scalacOptions += "-Yimports:scala,scala.Predef,java.lang,equality.all"
@@ -317,38 +316,6 @@ def areEqual(x1: Any, x2: Any): Boolean =
   x1 == x2
 ```
 
-## Reference equality
-
-The built-in `eq` and `ne` operators for comparing references are not equality-safe. 
-Therefore this library also provides equality-safe comparison of references via the [EqRef](https://github.com/antognini/type-safe-equality/blob/main/main/src/main/scala/equality/EqRef.scala) helper.
-
-```scala
-val myThing = MyThing()
-//     ^         ^   
-// reference   value
-```
-
-Equality-safe reference comparison:
-```scala
-import java.time.{LocalDate, LocalDateTime}
-
-val today = LocalDate.now
-val now = LocalDateTime.now
-
-// Compiles because references are not equality-safe
-today eq now
-
-val eqRef = EqRef[LocalDate]
-import eqRef.*
-
-// Compiles because references are of the same type
-today equalRef today
-today notEqualRef today
-
-today equalRef now
-// ERROR: Found (now : LocalDateTime); Required: LocalDate
-```
-
 
 # Library feature selection
 
@@ -370,20 +337,21 @@ scalacOptions += "-Yimports:scala,scala.Predef,java.lang,equality"
 Import every feature you want to use:
 
 ```scala
-// All Scala equality type class instances
-import equality.scala_all.given
+// All types and equality type class instances for package scala 
+import equality.scala_.{*, given}
 
-// All Java equality type class instances
-import equality.java_all.given
+// All types and equality type class instances for package scala.util 
+import equality.scala_util.{*, given}
 
-// All equality type class instances for package java.time 
-import equality.java_time.given
+// Equality-safe collection extension
+import equality.scala_collection.CollectionExtension.*
+
+// All types and equality type class instances for package java.time 
+import equality.java_time.{*, given}
 
 // Equality type class instance for java.time.LocalDate
 import equality.java_time.java_time_LocalDate
 
-// Equality-safe collection extension
-import equality.scala_collection.CollectionExtension.*
 ```
 ## Customized
 
@@ -393,11 +361,11 @@ scalacOptions += "-Yimports:scala,scala.Predef,java.lang,equality"
 Define an import object:
 ```scala
 object MyEq {
-  // all Eq instances for scala.*
-  export equality.scala_all.EqInstances.given
+  // all types and Eq instances for scala.*
+  export equality.scala_.EqInstances.{*, given}
 
-  // all Eq instances for java.util.*
-  export equality.java_util.EqInstances.given
+  // all types and Eq instances for java.util.*
+  export equality.java_util.EqInstances.{*, given}
 
   // Eq instance for java.io.File
   export equality.java_io.java_io_File
