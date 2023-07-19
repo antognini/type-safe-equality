@@ -1,28 +1,33 @@
 // Project
+val projectName = "type-safe-equality"
 ThisBuild / organization := "ch.produs"
 ThisBuild / organizationName := "produs ag"
 ThisBuild / organizationHomepage := None
 ThisBuild / description := "Scala 3 type safe equality"
-ThisBuild / homepage := Some(url("https://github.com/antognini/type-safe-equality"))
+ThisBuild / homepage := Some(url(s"https://github.com/antognini/$projectName"))
 ThisBuild / licenses := Seq("Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0"))
-ThisBuild / version := "0.5.0"
-ThisBuild / scalaVersion := "3.3.0"
+ThisBuild / version := "0.6.0"
 ThisBuild / versionScheme := Some("semver-spec")
-ThisBuild / publishTo := sonatypePublishToBundle.value
-ThisBuild / scmInfo := Some(
-  ScmInfo(
-    url("https://github.com/antognini/type-safe-equality"),
-    "scm:git@github.com:antognini/type-safe-equality.git"
-  ))
 ThisBuild / developers := List(
   Developer(
     id = "LA",
     name = "Luigi Antognini",
     email = "",
     url = url("https://github.com/antognini")
-  ))
+  )
+)
+ThisBuild / scmInfo := Some(
+  ScmInfo(
+    url(s"https://github.com/antognini/$projectName"),
+    s"scm:git@github.com:antognini/$projectName.git"
+  )
+)
+Global / onChangedBuildSource := ReloadOnSourceChanges
 
-lazy val compileOptions = Seq(
+
+// Compile
+ThisBuild / scalaVersion := "3.3.0"
+ThisBuild / Compile / scalacOptions := Seq(
   "-encoding", "utf8",
   "-deprecation",
   "-language:scala3",
@@ -33,34 +38,26 @@ lazy val compileOptions = Seq(
 //  "-Wunused:all"
 )
 
-lazy val root = project
-  .in(file("."))
-  .dependsOn(eq)
-  .settings(
-    name := "type-safe-equality",
-    publish / skip := true,
-    Compile / scalacOptions ++= compileOptions
-  )
-  .aggregate(eq, examples)
 
-lazy val eq = project
-  .in(file("eq"))
-  .settings(
-    libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest" % "3.2.16" % "test"
-    ),
-    name := "type-safe-equality",
-    Compile / scalacOptions ++= compileOptions
-  )
+lazy val root = project.in(file(".")).dependsOn(equality).settings(
+  name := projectName,
+  publish / skip := true
+).aggregate(equality, examples)
 
-lazy val examples = project
-  .in(file("examples"))
-  .dependsOn(eq)
-  .settings(
-    publish / skip := true,
-    Compile / scalacOptions ++= compileOptions,
-    Compile / scalacOptions += "-Yimports:scala,scala.Predef,java.lang,equality.all"
+lazy val equality = project.in(file("equality")).settings(
+  publishLocal := publishLocal.dependsOn(clean, Test / test).value,
+  publish := publish.dependsOn(clean, Test / test).value,
+  name := projectName,
+  libraryDependencies ++= Seq(
+    "org.scalatest" %% "scalatest" % "3.2.16" % "test"
   )
+)
+
+lazy val examples = project.in(file("examples")).dependsOn(equality).settings(
+  publish / skip := true,
+  Compile / scalacOptions += "-Yimports:scala,scala.Predef,java.lang,equality"
+)
+
 
 // Publish
 sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
@@ -79,3 +76,4 @@ credentials ++= Seq(
     Option(System.getenv("SONATYPE_PASSWORD")).getOrElse("")
   )
 )
+ThisBuild / publishTo := sonatypePublishToBundle.value
