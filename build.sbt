@@ -6,7 +6,7 @@ ThisBuild / organizationHomepage := None
 ThisBuild / description := "Scala 3 type safe equality"
 ThisBuild / homepage := Some(url(s"https://github.com/antognini/$projectName"))
 ThisBuild / licenses := Seq("Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0"))
-ThisBuild / version := "0.6.0"
+ThisBuild / version := "0.6.1"
 ThisBuild / versionScheme := Some("semver-spec")
 ThisBuild / developers := List(
   Developer(
