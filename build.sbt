@@ -1,3 +1,5 @@
+import xerial.sbt.Sonatype.sonatypeCentralHost
+
 // Project
 val projectName = "type-safe-equality"
 ThisBuild / organization := "ch.produs"
@@ -6,7 +8,7 @@ ThisBuild / organizationHomepage := None
 ThisBuild / description := "Scala 3 type safe equality"
 ThisBuild / homepage := Some(url(s"https://github.com/antognini/$projectName"))
 ThisBuild / licenses := Seq("Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0"))
-ThisBuild / version := "0.6.0"
+ThisBuild / version := "0.6.1"
 ThisBuild / versionScheme := Some("semver-spec")
 ThisBuild / developers := List(
   Developer(
@@ -26,7 +28,7 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 
 
 // Compile
-ThisBuild / scalaVersion := "3.3.0"
+ThisBuild / scalaVersion := "3.3.4"
 ThisBuild / Compile / scalacOptions := Seq(
   "-encoding", "utf8",
   "-deprecation",
@@ -49,7 +51,7 @@ lazy val equality = project.in(file("equality")).settings(
   publish := publish.dependsOn(clean, Test / test).value,
   name := projectName,
   libraryDependencies ++= Seq(
-    "org.scalatest" %% "scalatest" % "3.2.16" % "test"
+    "org.scalatest" %% "scalatest" % "3.2.19" % "test"
   )
 )
 
@@ -60,20 +62,14 @@ lazy val examples = project.in(file("examples")).dependsOn(equality).settings(
 
 
 // Publish
+ThisBuild / sonatypeCredentialHost := sonatypeCentralHost
 sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
-sonatypeCredentialHost := "s01.oss.sonatype.org"
 credentials ++= Seq(
   Credentials(
     "GnuPG Key ID",
     "gpg",
     "337D163DC4067320DB87C42BF5D2A41B6E7774A4",
     ""
-  ),
-  Credentials(
-    "Sonatype Nexus Repository Manager",
-    "s01.oss.sonatype.org",
-    "luigi-antognini",
-    Option(System.getenv("SONATYPE_PASSWORD")).getOrElse("")
   )
 )
 ThisBuild / publishTo := sonatypePublishToBundle.value

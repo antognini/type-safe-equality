@@ -18,3 +18,4 @@ object Instances:
   given java_util_Queue[E: Eq]: Eq[java.util.Queue[E]] = Eq.assumed
   given java_util_Set[E: Eq]: Eq[java.util.Set[E]] = Eq.assumed
   given java_util_TimeZone: Eq[java.util.TimeZone] = Eq.assumed
+  given java_util_UUID: Eq[java.util.UUID] = Eq.assumed

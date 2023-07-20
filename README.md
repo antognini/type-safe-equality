@@ -45,7 +45,7 @@ This library requires **[Scala 3.3](https://scala-lang.org/blog/2023/05/30/scala
 
 Include the library dependency in your `build.sbt` and enable strict equality:
 ```scala
-libraryDependencies += "ch.produs" %% "type-safe-equality" % "0.6.0"
+libraryDependencies += "ch.produs" %% "type-safe-equality" % "0.6.1"
 
 scalacOptions += "-language:strictEquality"
 scalacOptions += "-Yimports:scala,scala.Predef,java.lang,equality"
